@@ -21,12 +21,12 @@ mhm = raster('./database/mha/geo/mHM_grid.tif')
 ##################################################### Precipitation
 ##### Filenames and locations
 filename = "casty_cru_pre_mhm.nc"
-data_path = "../../../../data/"
+data_path = "./data/"
+resolution = 48000
 
 ##### Import as raster
 casty_P_ras = brick(x = paste0(data_path, filename))
 casty_P_ras = force2geo(casty_P_ras,mhm)
-resolution = 48000
 
 europe_lat = seq(casty_P_ras@extent@ymin, casty_P_ras@extent@ymax, resolution)
 europe_lon = seq(casty_P_ras@extent@xmin, casty_P_ras@extent@xmax, resolution)
@@ -60,11 +60,6 @@ filename = "casty_cru_pet_mhm.nc"
 ##### Import as raster
 casty_PET_ras = brick(x = paste0(data_path, filename))
 casty_PET_ras = force2geo(casty_PET_ras,mhm)
-# resolution = 48000
-
-europe_lat = seq(casty_P_ras@extent@ymin, casty_P_ras@extent@ymax, resolution)
-europe_lon = seq(casty_P_ras@extent@xmin, casty_P_ras@extent@xmax, resolution)
-europe_grid = expand.grid(europe_lon, europe_lat)
 
 casty_PET_dt = t(extract(casty_PET_ras, SpatialPoints(europe_grid)))
 
@@ -84,10 +79,7 @@ casty_PET_dt[, Var2 := NULL]
 setcolorder(casty_PET_dt, c("year", "month", "lon", "lat", "value")) 
 colnames(casty_PET_dt)[5] = "PET"
 
-casty_PET_dt[, sum(PET),by=list(year,lon,lat)]
 
-casty_PET_dt[, a_PET:=sum(PET),by=list(year,lon,lat)]
-casty_P_dt[, a_precip:=sum(precip),by=list(year,lon,lat)]
 
 
 
