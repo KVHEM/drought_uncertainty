@@ -1,0 +1,12 @@
+Model forcings:
+
+https://owncloud.cesnet.cz/index.php/s/W6f00Z2MO2ym4m6
+
+casty_cru_pre_mhm.nc for precipitation
+casty_cru_pet_mhm.nc for potential evapotranspiration
+
+Model results:
+
+https://owncloud.cesnet.cz/index.php/s/YKBQ0N4A5bhVfmv
+
+Sample: mHM_Fluxes_States_ncl_d4.nc
