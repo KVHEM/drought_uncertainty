@@ -1,6 +1,8 @@
 library(raster)
 library(data.table)
 
+setwd("~/sync/Various_Proj/drought_uncertainty/database") ## Local path where
+
 force2geo = function(force, mhm){
   
   force = flip(force, direction = 'y')
@@ -10,17 +12,16 @@ force2geo = function(force, mhm){
   ymin(force) <- ymin(mhm)
   
   force = mask(force, mhm)
-  
 }
 
-rb = readRDS('./mha/geo/ccm-regs.rds')    
-reg = readRDS('./mha/geo/srex-regs.rds')  
-mhm = raster('./mha/geo/mHM_grid.tif') 
+rb = readRDS('./database/mha/geo/ccm-regs.rds')    
+reg = readRDS('./database/mha/geo/srex-regs.rds')  
+mhm = raster('./database/mha/geo/mHM_grid.tif') 
 
 ##################################################### Precipitation
 ##### Filenames and locations
 filename = "casty_cru_pre_mhm.nc"
-data_path = "../data/"
+data_path = "../../../../data/"
 
 ##### Import as raster
 casty_P_ras = brick(x = paste0(data_path, filename))
