@@ -40,7 +40,7 @@ colnames(casty_pre) = nnames
 casty_pre = data.table(melt(casty_pre))
 casty_pre = casty_pre[complete.cases(casty_pre)]
 casty_pre[, year := as.numeric(substr(Var1, 2, 5))]
-casty_pre[, month := as.numeric(substr(Var1, 7, 8))]
+casty_pre$month = rep(1:12, nrow(casty_pre)/12)
 casty_pre[, Var2 := as.character(Var2)]
 casty_pre[, lon_y := as.numeric(sapply(strsplit(Var2, split = " ") , "[[", 1))]
 casty_pre[, lat_y := as.numeric(sapply(strsplit(Var2, split = " ") , "[[", 2))]
@@ -64,7 +64,7 @@ colnames(casty_pet) = nnames
 casty_pet <- data.table(melt(casty_pet))
 casty_pet <- casty_pet[complete.cases(casty_pet)]
 casty_pet[, year := as.numeric(substr(Var1, 2, 5))]
-casty_pet[, month := as.numeric(substr(Var1, 7, 8))]
+casty_pet$month = rep(1:12, nrow(casty_pet)/12)
 casty_pet[, Var2 := as.character(Var2)]
 casty_pet[, lon_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 1))]
 casty_pet[, lat_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 2))]
@@ -73,19 +73,23 @@ casty_pet[, Var2 := NULL]
 setcolorder(casty_pet, c("year", "month", "lon_y", "lat_y", "value")) 
 colnames(casty_pet)[5] = "pet"
 
-mhm_input = merge(casty_pet_dt, casty_pre_dt)
+mhm_input = merge(casty_pet, casty_pre)
 
 ##################################################### Output: Runoff
 filename = "output/mHM_Fluxes_States_ncl_d4.nc"
 mhm_q_ras <- brick(x = paste0(data_path, filename), varname = "Q")
+
+europe_lat_y <- seq(mhm_q_ras@extent@ymin, mhm_q_ras@extent@ymax, resolution)
+europe_lon_y <- seq(mhm_q_ras@extent@xmin, mhm_q_ras@extent@xmax, resolution)
+europe_grid <- expand.grid(europe_lon_y, europe_lat_y)
 
 mhm_q <- t(extract(mhm_q_ras, SpatialPoints(europe_grid)))
 colnames(mhm_q) = nnames
 
 mhm_q <- data.table(melt(mhm_q))
 mhm_q <- mhm_q[complete.cases(mhm_q)]
-mhm_q[, year := as.numeric(substr(Var1, 2, 5))]
-mhm_q[, month := as.numeric(substr(Var1, 7, 8))]
+mhm_q$year = as.numeric(rep(1766:2015, nrow(mhm_q)/250))
+mhm_q$month = rep(1:12, nrow(mhm_q)/12)
 mhm_q[, Var2 := as.character(Var2)]
 mhm_q[, lon_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 1))]
 mhm_q[, lat_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 2))]
@@ -101,8 +105,8 @@ colnames(mhm_sm) = nnames
 
 mhm_sm <- data.table(melt(mhm_sm))
 mhm_sm <- mhm_sm[complete.cases(mhm_sm)]
-mhm_sm[, year := as.numeric(substr(Var1, 2, 5))]
-mhm_sm[, month := as.numeric(substr(Var1, 7, 8))]
+mhm_sm$year = as.numeric(rep(1766:2015, nrow(mhm_sm)/250))
+mhm_sm$month = rep(1:12, nrow(mhm_sm)/12)
 mhm_sm[, Var2 := as.character(Var2)]
 mhm_sm[, lon_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 1))]
 mhm_sm[, lat_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 2))]
@@ -111,7 +115,7 @@ mhm_sm[, Var2 := NULL]
 setcolorder(mhm_sm, c("year", "month", "lon_y", "lat_y", "value")) 
 colnames(mhm_sm)[5] = "sm"
 
-mhm_output = merge(mhm_sm, mhm_q)
+mhm_output = merge(mhm_q, mhm_sm)
 
 ###################################################### Save Files
 saveRDS(casty_pet, file = paste0(data_path, "casty_cru_pet_mhm.Rds"))

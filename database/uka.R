@@ -10,7 +10,10 @@ force2geo = function(force, mhm){
   
 }
 
-setwd('./mha/')
+require(raster)
+require(data.table)
+
+setwd('/home/owc/GACR/BUDY/mha/')
 rb = readRDS('geo/ccm-regs.rds')   # geodata - evropske oblasti povodi
 reg = readRDS('geo/srex-regs.rds') # IPCC oblasti
 mhm = raster('geo/mHM_grid.tif') 
@@ -18,7 +21,6 @@ mhm = raster('geo/mHM_grid.tif')
 
 setwd('/home/owc/PaleoHydroEU/data_preparation/forcings/map_meteo_to_mhm_grid/')
 p = brick('casty_cru_pre_mhm.nc') # nacti srazky
-pok=force2geo(casty_P_ras,mhm)
 p = force2geo(p, mhm)
 
 t = brick('casty_cru_tavg_mhm.nc') # nacti teplotu
@@ -54,4 +56,7 @@ dta = dta[!paste(x, y) %in% excl$V1, ]
 dta = reg[dta, on = c('x', 'y')] # add regions
 dta = rb[dta, on = c('x', 'y')]
 
-dta[, obd:= cut(DTM, breaks = '30 year'), by = .(x, y, var)]
+#dta[, obd:= cut(DTM, breaks = '30 year'), by = .(x, y, var)]
+
+dta[, LON := xFromCol(mhm, x)]
+dta[, LAT := yFromRow(mhm, y)]
