@@ -25,6 +25,7 @@ vars
 ensemble <- data.table(expand.grid(1:10, 1:10))
 ensemble[, ens_id := 1:nrow(ensemble)]
 colnames(ensemble)[1:2] <- c('met', 'par')
+saveRDS(vars, "./database/results/vars_dt.rds")
 
 my_database <- src_sqlite(path = "mhm_db", create = TRUE)
 
