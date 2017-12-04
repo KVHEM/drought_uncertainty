@@ -13,11 +13,13 @@ force2geo = function(force, mhm){
 require(raster)
 require(data.table)
 
-rb = readRDS('./geo/ccm-regs.rds')   # geodata - evropske oblasti povodi
-reg = readRDS('./geo/srex-regs.rds') # IPCC oblasti
-mhm = raster('./geo/mHM_grid.tif') 
+setwd("./database/")
 
-setwd('../data/')
+rb = readRDS('./data/geo/ccm-regs.rds')   # geodata - evropske oblasti povodi
+reg = readRDS('./data/geo/srex-regs.rds') # IPCC oblasti
+mhm = raster('./data/geo/mHM_grid.tif') 
+
+setwd('./data/raw_data/')
 p = brick('casty_cru_pre_mhm.nc') # nacti srazky
 p = force2geo(p, mhm)
 
@@ -56,3 +58,12 @@ dta = rb[dta, on = c('x', 'y')]
 
 dta[, lon := xFromCol(mhm, x)]
 dta[, lat := yFromRow(mhm, y)]
+dta
+
+setwd("../../../data/")
+
+dta[, y := NULL]
+dta[, x := NULL]
+dta[, CCM_REG := NULL]
+
+saveRDS(dta, file = "./mhm_all.Rds")
