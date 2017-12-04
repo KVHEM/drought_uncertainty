@@ -2,7 +2,7 @@ library(dplyr)
 library(ggplot2)
 library(data.table)
 
-alldata <- readRDS("./data/mhm_all.Rds")
+alldata <- readRDS("./database/data/mhm_all.Rds")
 
 spat <- alldata[, .(lat, lon, CCM_LAB, REG)]
 spat <- unique(spat)
@@ -12,25 +12,19 @@ temp <- alldata[, .(dtm)]
 temp <- unique(temp)
 temp[, month := month(dtm)]
 temp[, year := year(dtm)]
-temp[, dtm := NULL]
 temp[, temp_id := 1:nrow(temp)]
 
-vars <- alldata[, .(var, value)]
-p_var <- vars[var %in% 'p'] 
-pet_var <- vars[var %in% 'pet']
-vars <- data.table(cbind(pre = p_var$value, pet = pet_var$value))
-vars[, vars_id := 1:nrow(vars)]
+vars <- merge(alldata, temp, by = "dtm")
+vars <- merge(vars, spat, by = c("lat", "lon"))
+vars = vars[, .(sp_id, temp_id, var, value)]
+vars = dcast(vars, sp_id + temp_id ~ var, value.var = "value")
+vars[, vars_id := 1:nrow(vars)] 
+vars[, ens_id := 1]
+vars
 
-mhm <- alldata
-mhm <- unique(mhm)
-mhm[, mhm_id := 1:nrow(mhm)]
-
-mhm <- merge(mhm, temp, by = c("year", "month"))
-mhm <- merge(mhm, spat, by = c("lat", "lon"))
-
-mhm[, ens_id := 1]   # create ens table 
-mhm <- mhm[ , .(ens_id, mhm_id, sp_id, temp_id, pet, pre, sm, q)]
-
+ensemble <- data.table(expand.grid(1:10, 1:10))
+ensemble[, ens_id := 1:nrow(ensemble)]
+colnames(ensemble)[1:2] <- c('met', 'par')
 
 my_database <- src_sqlite(path = "mhm_db", create = TRUE)
 
