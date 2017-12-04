@@ -59,3 +59,11 @@ dta = rb[dta, on = c('x', 'y')]
 dta[, lon := xFromCol(mhm, x)]
 dta[, lat := yFromRow(mhm, y)]
 dta
+
+setwd("../../../data/")
+
+dta[, y := NULL]
+dta[, x := NULL]
+dta[, CCM_REG := NULL]
+
+saveRDS(dta, file = "./mhm_all.Rds")
