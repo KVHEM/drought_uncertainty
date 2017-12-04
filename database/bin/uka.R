@@ -58,7 +58,6 @@ dta = rb[dta, on = c('x', 'y')]
 
 dta[, lon := xFromCol(mhm, x)]
 dta[, lat := yFromRow(mhm, y)]
-dta
 
 setwd("../../../data/")
 

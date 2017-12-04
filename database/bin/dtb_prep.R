@@ -19,8 +19,6 @@ vars <- merge(vars, spat, by = c("lat", "lon"))
 vars = vars[, .(sp_id, temp_id, var, value)]
 vars = dcast(vars, sp_id + temp_id ~ var, value.var = "value")
 vars[, vars_id := 1:nrow(vars)] 
-vars[, ens_id := 1]
-vars
 
 ensemble <- data.table(expand.grid(1:10, 1:10))
 ensemble[, ens_id := 1:nrow(ensemble)]
