@@ -4,3 +4,4 @@
 - [x] Prepare data for database
 - [x] Design database
 - [ ] Copy data to database
+- [ ] Design experiment
