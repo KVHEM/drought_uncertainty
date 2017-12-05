@@ -1,1 +1,5 @@
 Literature review.
+
+File names: 
+bib file should contain keywords from webofscience
+text file should contain bib file name + last word which was used for "grep" to filter out abstracts
