@@ -1,130 +1,68 @@
-library(raster)
-library(data.table)
-
-getwd() ## Local path where the project lies
-
-force2geo <- function(force, mhm){
+force2geo = function(force, mhm){
+  
   force = flip(force, direction = 'y')
   xmin(force) <- xmin(mhm)
   xmax(force) <- xmax(mhm)
   ymax(force) <- ymax(mhm)
   ymin(force) <- ymin(mhm)
-  force <- mask(force, mhm)
+  
+  force = mask(force, mhm)
+  
 }
 
-rb <- readRDS('./database/mha/geo/ccm-regs.rds')    
-reg <- readRDS('./database/mha/geo/srex-regs.rds')  
-mhm <- raster('./database/mha/geo/mHM_grid.tif') 
+require(raster)
+require(data.table)
 
-##################################################### Precipitation
-##### Filenames and locations
-filename <- "casty_cru_pre_mhm.nc"
-data_path <- "./data/"
-resolution <- 48000
+setwd("./database/")
 
-##### Import as raster
-casty_pre_ras <- brick(x = paste0(data_path, filename))
-casty_pre_ras <- force2geo(casty_pre_ras,mhm)
+rb = readRDS('./data/geo/ccm-regs.rds')   # geodata - evropske oblasti povodi
+reg = readRDS('./data/geo/srex-regs.rds') # IPCC oblasti
+mhm = raster('./data/geo/mHM_grid.tif') 
 
-europe_lat_y <- seq(casty_pre_ras@extent@ymin, casty_pre_ras@extent@ymax, resolution)
-europe_lon_y <- seq(casty_pre_ras@extent@xmin, casty_pre_ras@extent@xmax, resolution)
-europe_grid <- expand.grid(europe_lon_y, europe_lat_y)
+setwd('./data/raw_data/')
+p = brick('casty_cru_pre_mhm.nc') # nacti srazky
+p = force2geo(p, mhm)
 
-casty_pre <- t(extract(casty_pre_ras, SpatialPoints(europe_grid)))
-dim(casty_pre)
+t = brick('casty_cru_tavg_mhm.nc') # nacti teplotu
+t = force2geo(t, mhm)
 
-nnames <- apply(europe_grid, 1, paste, collapse = " ")
-colnames(casty_pre) = nnames
+pt = brick('casty_cru_pet_mhm.nc') # nacti pet
+pt = force2geo(pt, mhm)
 
-##### Transform to data.table format
-casty_pre = data.table(melt(casty_pre))
-casty_pre = casty_pre[complete.cases(casty_pre)]
-casty_pre[, year := as.numeric(substr(Var1, 2, 5))]
-casty_pre$month = rep(1:12, nrow(casty_pre)/12)
-casty_pre[, Var2 := as.character(Var2)]
-casty_pre[, lon_y := as.numeric(sapply(strsplit(Var2, split = " ") , "[[", 1))]
-casty_pre[, lat_y := as.numeric(sapply(strsplit(Var2, split = " ") , "[[", 2))]
-casty_pre[, Var1 := NULL]
-casty_pre[, Var2 := NULL]
-setcolorder(casty_pre, c("year", "month", "lon_y", "lat_y", "value")) 
-colnames(casty_pre)[5] = "pre"
+setwd('./output/')
+q = brick('mHM_Fluxes_States_ncl_d4.nc', varname = 'Q')
+s = brick('mHM_Fluxes_States_ncl_d4.nc', varname = 'SM')
 
-##################################################### PET
-##### Filenames 
-filename = "casty_cru_pet_mhm.nc"
+osa = as.IDate(seq.Date(from = as.Date('1766-01-01'), to = as.Date('2015-12-01'), by = 'month'))
 
-##### Import as raster
-casty_pet_ras <- brick(x = paste0(data_path, filename))
-casty_pet_ras <- force2geo(casty_pet_ras,mhm)
+dta = list() 
+for (ii in 1:5){
+  dt = as.array(list(p, q, s, t, pt)[[ii]]) # convert raster to array 
+  dimnames(dt) = list(y = 1:nrow(q), x = 1:ncol(q), dtm = as.character(osa))
+  dta[[ii]] = data.table(var = c('p', 'q', 's', 't', 'pet')[ii], melt(dt))[!is.na(value)] # convert to data.table
+}
 
-casty_pet <- t(extract(casty_pet_ras, SpatialPoints(europe_grid)))
-colnames(casty_pet) = nnames
+dta = rbindlist(dta) 
+dta[, dtm := NULL] # it is not date, conversion from factor to IDate is extremely slow
+dta[, dtm := osa, by = .(var, y, x)] # better to replace - was checked
+dta = dta[!is.na(value)]
 
-##### Transform to data.table format
-casty_pet <- data.table(melt(casty_pet))
-casty_pet <- casty_pet[complete.cases(casty_pet)]
-casty_pet[, year := as.numeric(substr(Var1, 2, 5))]
-casty_pet$month = rep(1:12, nrow(casty_pet)/12)
-casty_pet[, Var2 := as.character(Var2)]
-casty_pet[, lon_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 1))]
-casty_pet[, lat_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 2))]
-casty_pet[, Var1 := NULL]
-casty_pet[, Var2 := NULL]
-setcolorder(casty_pet, c("year", "month", "lon_y", "lat_y", "value")) 
-colnames(casty_pet)[5] = "pet"
+xy = dta[dtm==dtm[1], ][, unique(paste(x, y)), by = var]
+excl = dcast.data.table(xy, V1 ~ var)[is.na(t)]
+dta = dta[!paste(x, y) %in% excl$V1, ]
 
-mhm_input = merge(casty_pet, casty_pre)
+dta = reg[dta, on = c('x', 'y')] # add regions
+dta = rb[dta, on = c('x', 'y')]
 
-##################################################### Output: Runoff
-filename = "output/mHM_Fluxes_States_ncl_d4.nc"
-mhm_q_ras <- brick(x = paste0(data_path, filename), varname = "Q")
+#dta[, obd:= cut(dtm, breaks = '30 year'), by = .(x, y, var)]
 
-europe_lat_y <- seq(mhm_q_ras@extent@ymin, mhm_q_ras@extent@ymax, resolution)
-europe_lon_y <- seq(mhm_q_ras@extent@xmin, mhm_q_ras@extent@xmax, resolution)
-europe_grid <- expand.grid(europe_lon_y, europe_lat_y)
+dta[, lon := xFromCol(mhm, x)]
+dta[, lat := yFromRow(mhm, y)]
 
-mhm_q <- t(extract(mhm_q_ras, SpatialPoints(europe_grid)))
-colnames(mhm_q) = nnames
+setwd("../../../data/")
 
-mhm_q <- data.table(melt(mhm_q))
-mhm_q <- mhm_q[complete.cases(mhm_q)]
-mhm_q$year = as.numeric(rep(1766:2015, nrow(mhm_q)/250))
-mhm_q$month = rep(1:12, nrow(mhm_q)/12)
-mhm_q[, Var2 := as.character(Var2)]
-mhm_q[, lon_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 1))]
-mhm_q[, lat_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 2))]
-mhm_q[, Var1 := NULL]
-mhm_q[, Var2 := NULL]
-setcolorder(mhm_q, c("year", "month", "lon_y", "lat_y", "value")) 
-colnames(mhm_q)[5] = "q"
+dta[, y := NULL]
+dta[, x := NULL]
+dta[, CCM_REG := NULL]
 
-##################################################### Output: Soilmoisture
-mhm_sm_ras <- brick(x = paste0(data_path, filename), varname = "SM")
-mhm_sm <- t(extract(mhm_sm_ras, SpatialPoints(europe_grid)))
-colnames(mhm_sm) = nnames
-
-mhm_sm <- data.table(melt(mhm_sm))
-mhm_sm <- mhm_sm[complete.cases(mhm_sm)]
-mhm_sm$year = as.numeric(rep(1766:2015, nrow(mhm_sm)/250))
-mhm_sm$month = rep(1:12, nrow(mhm_sm)/12)
-mhm_sm[, Var2 := as.character(Var2)]
-mhm_sm[, lon_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 1))]
-mhm_sm[, lat_y := as.numeric(sapply(strsplit(Var2,split=" ") , "[[", 2))]
-mhm_sm[, Var1 := NULL]
-mhm_sm[, Var2 := NULL]
-setcolorder(mhm_sm, c("year", "month", "lon_y", "lat_y", "value")) 
-colnames(mhm_sm)[5] = "sm"
-
-mhm_output = merge(mhm_q, mhm_sm)
-
-###################################################### Save Files
-saveRDS(casty_pet, file = paste0(data_path, "casty_cru_pet_mhm.Rds"))
-saveRDS(casty_pre, paste0(data_path, "casty_cru_pre_mhm.Rds"))
-saveRDS(mhm_output, file = paste0(data_path, "mhm_output.Rds"))
-saveRDS(mhm_input, file = paste0(data_path, "mhm_input.Rds"))
-saveRDS(merge(mhm_input,mhm_output),  file = paste0(data_path, "mhm_all.Rds"))
-
-
-
-
-
+saveRDS(dta, file = "./mhm_all.Rds")
