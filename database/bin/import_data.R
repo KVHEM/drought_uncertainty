@@ -29,11 +29,11 @@ t = force2geo(t, mhm)
 pt = brick('casty_cru_pet_mhm.nc') # nacti pet
 pt = force2geo(pt, mhm)
 
-setwd('./output/')
-q = brick('mHM_Fluxes_States_ncl_d4.nc', varname = 'Q')
-s = brick('mHM_Fluxes_States_ncl_d4.nc', varname = 'SM')
-
 osa = as.IDate(seq.Date(from = as.Date('1766-01-01'), to = as.Date('2015-12-01'), by = 'month'))
+
+setwd('./output/')
+q = brick('mHM_Fluxes_States_ncl_d4.nc', varname = 'Q')   # loop marker
+s = brick('mHM_Fluxes_States_ncl_d4.nc', varname = 'SM')   # loop marker
 
 dta = list() 
 for (ii in 1:5){
