@@ -30,7 +30,7 @@ saveRDS(vars, "./database/results/vars_dt.rds")
 
 my_database <- src_sqlite(path = "mhm_db", create = TRUE)
 
-copy_to(my_database, demography, temporary = FALSE)
+copy_to(my_database, aa, temporary = FALSE)
 
 
 

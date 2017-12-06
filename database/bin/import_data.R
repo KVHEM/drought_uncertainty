@@ -14,6 +14,9 @@ require(raster)
 require(data.table)
 
 setwd("./database/")
+path_data_storage = "C:/Users/markonis/Documents/Data/MHM/"
+ens_par_dirs = list.files(path_data_storage)
+ens_met_dirs = list.files(paste0(path_data_storage, ens_par_dirs[1]))
 
 rb = readRDS('./data/geo/ccm-regs.rds')   # geodata - evropske oblasti povodi
 reg = readRDS('./data/geo/srex-regs.rds') # IPCC oblasti
@@ -32,8 +35,9 @@ pt = force2geo(pt, mhm)
 osa = as.IDate(seq.Date(from = as.Date('1766-01-01'), to = as.Date('2015-12-01'), by = 'month'))
 
 setwd('./output/')
-q = brick('mHM_Fluxes_States_ncl_d4.nc', varname = 'Q')   # loop marker
-s = brick('mHM_Fluxes_States_ncl_d4.nc', varname = 'SM')   # loop marker
+
+q = brick(paste0(path_data_storage, ens_par_dirs[1], "/", ens_met_dirs[1], '/output/mHM_Fluxes_States_ncl_d4.nc'), varname = 'Q')   # loop marker
+s = brick(paste0(path_data_storage, ens_par_dirs[1], "/", ens_met_dirs[1], '/output/mHM_Fluxes_States_ncl_d4.nc'), varname = 'SM')   # loop marker
 
 dta = list() 
 for (ii in 1:5){
