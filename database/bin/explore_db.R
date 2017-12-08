@@ -1,7 +1,7 @@
 library(dbplyr)
 library(data.table)
 
-mhm_database <- src_sqlite("mhm_db") 
+mhm_database <- src_sqlite("C:/Users/markonis/Documents/Data/MHM/database/mhm_db") 
 src_tbls(mhm_database)
 
 db_vars <- tbl(mhm_database, "vars")

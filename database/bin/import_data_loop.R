@@ -13,13 +13,9 @@ force2geo = function(force, mhm){
   
 }
 
-path_data_storage = "C:/Users/markonis/Documents/Data/MHM/"
-ens_par_dirs = list.files(path_data_storage)
-ens_met_dirs = list.files(paste0(path_data_storage, ens_par_dirs[1]))
-
 alldata <- readRDS("./data/mhm_all.Rds")
 
-path_data_storage = "C:/Users/markonis/Documents/Data/MHM/"
+path_data_storage = "C:/Users/markonis/Documents/Data/MHM/mhm_out/"
 ens_par_dirs = list.files(path_data_storage)
 ens_met_dirs = list.files(paste0(path_data_storage, ens_par_dirs[1]))
 
@@ -93,12 +89,11 @@ for(par_set in 1:10){ #ens_par loop
     vars[, vars_id := 1:nrow(vars)] 
     vars[, ens_id := ensemble$ens_id[ens_counter]]                              
     
-    saveRDS(vars, paste0(path_data_storage, "vars_dt_par", par_set, "_met", met_set, ".Rds"))
+    saveRDS(vars, paste0(path_data_storage, "rds/vars_dt_par", par_set, "_met", met_set, ".Rds"))
   }  #ens_met loop
 }  #ens_par loop
 
-aa <- readRDS(paste0(path_data_storage, "vars_dt_par", 1, "_met", 1, ".Rds"))
-bb <- readRDS(paste0(path_data_storage, "vars_dt_par", 1, "_met", 2, ".Rds"))
+
 
 
 
