@@ -1,10 +1,13 @@
-library(dbplyr)
+library(dplyr)
+library(ggplot2)
 library(data.table)
 
-mhm_database <- src_sqlite("C:/Users/markonis/Documents/Data/MHM/database/mhm_db") 
-src_tbls(mhm_database)
+path_data_storage = "C:/Users/markonis/Documents/Data/MHM/database/"
 
-db_vars <- tbl(mhm_database, "vars")
+mhm_db <- src_sqlite(path = paste0(path_data_storage, "mhm_db"))
+src_tbls(mhm_db)
+
+db_vars <- tbl(mhm_db, "vars")
 
 random_point <- filter(db_vars, sp_id == '1111')  # Get
 explain(random_point)
