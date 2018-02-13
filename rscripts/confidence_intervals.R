@@ -32,3 +32,11 @@ ggplot(res.conf.int) +
   theme_bw() +
   facet_wrap(REG ~ var, scales = 'free', ncol = 2) +
   labs(x = 'p', y = 'value', title = 'Confidence intervals')
+
+ggplot(res.conf.int) +
+  geom_ribbon(aes(x = -log(-log(q)), ymin = rib_1_min, ymax = rib_1_max), fill = 'steelblue4', alpha = .4) +
+  geom_ribbon(aes(x = -log(-log(q)), ymin = rib_2_min, ymax = rib_2_max), fill = 'steelblue4', alpha = .8) +
+  geom_line(aes(x = -log(-log(q)), y = ensamble_median), col = 'red4', lwd = .5) + 
+  theme_bw() +
+  facet_wrap(REG ~ var, scales = 'free', ncol = 2) +
+  labs(x = 'Gumbel variate', y = 'value', title = 'Confidence intervals')
