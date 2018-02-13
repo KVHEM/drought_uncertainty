@@ -8,7 +8,7 @@ dta <- dta[(var != 'p') & (REG != 'EUR'),]
 
 # head(dta)
 
-q.seq <- seq(.1, .99, .01)
+q_seq <- seq(.1, .99, .01)
 
 prbs <- sort(c(outer_ribbon, inner_ribbon))
 
