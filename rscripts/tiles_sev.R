@@ -37,9 +37,10 @@ ggplot(uncer_noise_sev[REG == "CEU" & VAR == "s" & NOISE > 10,]) +
         legend.position = "bottom",
         panel.border = element_rect(fill = NA, colour = "black", size = 5))
 ################ RAW #####
+years_ceu_s <- unique(uncer_noise_sev[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
 
-ceu_s <- ggplot(uncer_noise_sev[REG == "CEU" & VAR == "s" & NOISE > 10,]) +
-  geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(225, 230, 235, 240, 245, 250))), colour = "white") +
+ceu_s <- ggplot(uncer_raw[REG == "CEU" & VAR == "s" & RANK_SEV >= 125 & YR %in% years_ceu_s,]) +
+  geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(125, 224, 247, 250))), colour = "white") +
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
@@ -71,19 +72,19 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_ceu <- uncer_raw[REG == "CEU" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_ceu[RANK_SEV <= 225 ,SEV_COL:= "#EBEBEB"]
-tab_col_ceu[RANK_SEV > 225 & RANK_SEV <= 230 ,SEV_COL:= "#440053"]
-tab_col_ceu[RANK_SEV > 230 & RANK_SEV <= 235 ,SEV_COL:= "#3C458A"]
-tab_col_ceu[RANK_SEV > 235 & RANK_SEV <= 240 ,SEV_COL:= "#26908C"]
-tab_col_ceu[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
-tab_col_ceu[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= "#EBEBEB"]
+tab_col_ceu[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
+tab_col_ceu[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
+tab_col_ceu[RANK_SEV > 247 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+#tab_col_ceu[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
+#tab_col_ceu[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_ceu[RANK_AREA <= 225, AREA_COL:= "#EBEBEB"]
-tab_col_ceu[RANK_AREA > 225 & RANK_AREA <= 230 ,AREA_COL:= "#440053"]
-tab_col_ceu[RANK_AREA > 230 & RANK_AREA <= 235 ,AREA_COL:= "#3C458A"]
-tab_col_ceu[RANK_AREA > 235 & RANK_AREA <= 240 ,AREA_COL:= "#26908C"]
-tab_col_ceu[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
-tab_col_ceu[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+tab_col_ceu[RANK_AREA <= 125, AREA_COL:= "#EBEBEB"]
+tab_col_ceu[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
+tab_col_ceu[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
+tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+#tab_col_ceu[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
+#tab_col_ceu[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
 tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 tab_col_ceu3 <- tab_col_ceu2[order(tab_col_ceu2$ORD)]
@@ -101,9 +102,10 @@ for (i in stript) {
 #grid.draw(ceu_s_g)
 
 ############ MED Soil drought / Area ##########
+years_med_s <- unique(uncer_noise_sev[REG == "MED" & VAR == "s" & NOISE > 10,]$YR)
 
-med_s <- ggplot(uncer_noise_sev[REG == "MED" & VAR == "s" & NOISE > 10,]) +
-  geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(225, 230, 235, 240, 245, 250))), colour = "white") +
+med_s <- ggplot(uncer_raw[REG == "MED" & VAR == "s" & RANK_SEV >= 125 & YR %in% years_med_s,]) +
+  geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(125, 224, 247, 250))), colour = "white") +
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
@@ -135,19 +137,19 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_med <- uncer_raw[REG == "MED" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_med[RANK_SEV <= 225 ,SEV_COL:= "#EBEBEB"]
-tab_col_med[RANK_SEV > 225 & RANK_SEV <= 230 ,SEV_COL:= "#440053"]
-tab_col_med[RANK_SEV > 230 & RANK_SEV <= 235 ,SEV_COL:= "#3C458A"]
-tab_col_med[RANK_SEV > 235 & RANK_SEV <= 240 ,SEV_COL:= "#26908C"]
-tab_col_med[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
-tab_col_med[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+tab_col_med[RANK_SEV <= 125 ,SEV_COL:= "#EBEBEB"]
+tab_col_med[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
+tab_col_med[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
+tab_col_med[RANK_SEV > 250 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+#tab_col_med[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
+#tab_col_med[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_med[RANK_AREA <= 225, AREA_COL:= "#EBEBEB"]
-tab_col_med[RANK_AREA > 225 & RANK_AREA <= 230 ,AREA_COL:= "#440053"]
-tab_col_med[RANK_AREA > 230 & RANK_AREA <= 235 ,AREA_COL:= "#3C458A"]
-tab_col_med[RANK_AREA > 235 & RANK_AREA <= 240 ,AREA_COL:= "#26908C"]
-tab_col_med[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
-tab_col_med[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+tab_col_med[RANK_AREA <= 125, AREA_COL:= "#EBEBEB"]
+tab_col_med[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
+tab_col_med[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
+tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+#tab_col_med[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
+#tab_col_med[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
 tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 tab_col_med3 <- tab_col_med2[order(tab_col_med2$ORD)]
@@ -165,9 +167,10 @@ for (i in stript) {
 #grid.draw(med_s_g)
 
 ##################### CEU Discharge drought / Area #############################
+years_ceu_q <- unique(uncer_noise_sev[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
 
-ceu_q <- ggplot(uncer_noise_sev[REG == "CEU" & VAR == "q" & NOISE > 10,]) +
-  geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(225, 230, 235, 240, 245, 250))), colour = "white") +
+ceu_q <- ggplot(uncer_raw[REG == "CEU" & VAR == "q" & RANK_SEV >= 125 & YR %in% years_ceu_q,]) +
+  geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(125, 224, 247, 250))), colour = "white") +
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
@@ -199,19 +202,19 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_ceu <- uncer_raw[REG == "CEU" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_ceu[RANK_SEV <= 225 ,SEV_COL:= "#EBEBEB"]
-tab_col_ceu[RANK_SEV > 225 & RANK_SEV <= 230 ,SEV_COL:= "#440053"]
-tab_col_ceu[RANK_SEV > 230 & RANK_SEV <= 235 ,SEV_COL:= "#3C458A"]
-tab_col_ceu[RANK_SEV > 235 & RANK_SEV <= 240 ,SEV_COL:= "#26908C"]
-tab_col_ceu[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
-tab_col_ceu[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= "#EBEBEB"]
+tab_col_ceu[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
+tab_col_ceu[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
+tab_col_ceu[RANK_SEV > 247 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+#tab_col_ceu[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
+#tab_col_ceu[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_ceu[RANK_AREA <= 225, AREA_COL:= "#EBEBEB"]
-tab_col_ceu[RANK_AREA > 225 & RANK_AREA <= 230 ,AREA_COL:= "#440053"]
-tab_col_ceu[RANK_AREA > 230 & RANK_AREA <= 235 ,AREA_COL:= "#3C458A"]
-tab_col_ceu[RANK_AREA > 235 & RANK_AREA <= 240 ,AREA_COL:= "#26908C"]
-tab_col_ceu[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
-tab_col_ceu[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+tab_col_ceu[RANK_AREA <= 125, AREA_COL:= "#EBEBEB"]
+tab_col_ceu[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
+tab_col_ceu[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
+tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+#tab_col_ceu[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
+#tab_col_ceu[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
 tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 tab_col_ceu3 <- tab_col_ceu2[order(tab_col_ceu2$ORD)]
@@ -229,9 +232,10 @@ for (i in stript) {
 #grid.draw(ceu_q_g)
 
 ######################### MED Discharge drought / Area #########################
+years_med_q <- unique(uncer_noise_sev[REG == "MED" & VAR == "q" & NOISE > 10,]$YR)
 
-med_q <- ggplot(uncer_noise_sev[REG == "MED" & VAR == "q" & NOISE > 10,]) +
-  geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(225, 230, 235, 240, 245, 250))), colour = "white") +
+med_q <- ggplot(uncer_raw[REG == "MED" & VAR == "q" & RANK_SEV >= 125 & YR %in% years_med_q,]) +
+  geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(125, 224, 247, 250))), colour = "white") +
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
@@ -263,19 +267,19 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_med <- uncer_raw[REG == "MED" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_med[RANK_SEV <= 225 ,SEV_COL:= "#EBEBEB"]
-tab_col_med[RANK_SEV > 225 & RANK_SEV <= 230 ,SEV_COL:= "#440053"]
-tab_col_med[RANK_SEV > 230 & RANK_SEV <= 235 ,SEV_COL:= "#3C458A"]
-tab_col_med[RANK_SEV > 235 & RANK_SEV <= 240 ,SEV_COL:= "#26908C"]
-tab_col_med[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
-tab_col_med[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+tab_col_med[RANK_SEV <= 125 ,SEV_COL:= "#EBEBEB"]
+tab_col_med[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
+tab_col_med[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
+tab_col_med[RANK_SEV > 250 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+#tab_col_med[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
+#tab_col_med[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_med[RANK_AREA <= 225, AREA_COL:= "#EBEBEB"]
-tab_col_med[RANK_AREA > 225 & RANK_AREA <= 230 ,AREA_COL:= "#440053"]
-tab_col_med[RANK_AREA > 230 & RANK_AREA <= 235 ,AREA_COL:= "#3C458A"]
-tab_col_med[RANK_AREA > 235 & RANK_AREA <= 240 ,AREA_COL:= "#26908C"]
-tab_col_med[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
-tab_col_med[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+tab_col_med[RANK_AREA <= 125, AREA_COL:= "#EBEBEB"]
+tab_col_med[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
+tab_col_med[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
+tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+#tab_col_med[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
+#tab_col_med[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
 tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 tab_col_med3 <- tab_col_med2[order(tab_col_med2$ORD)]
