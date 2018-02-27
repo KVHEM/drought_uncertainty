@@ -19,6 +19,18 @@ uncer_raw[, ID:= paste0(MET, "_", PAR)]
 uncer_raw[, RANK_SEV:= rank(SEVERITY, na.last = FALSE), by = .(REG, ID, var)]
 uncer_raw[, RANK_AREA:= rank(AREA, na.last = FALSE), by = .(REG, ID, var)]
 colnames(uncer_raw) <- c("REG", "VAR", "YR", "SEVERITY", "AREA", "MET", "PAR", "ID", "RANK_SEV", "RANK_AREA") 
+###### ID 7_1 ######
+
+uncer_raw[ID %in% c("8_1", "7_2", "6_1")]
+dat7_1 <- uncer_raw[, {SEVERITY = mean(SEVERITY); AREA = mean(AREA); RANK_SEV = mean(RANK_SEV); 
+RANK_AREA = mean(RANK_AREA); list(SEVERITY = SEVERITY, AREA = AREA, RANK_SEV = RANK_SEV, RANK_AREA = RANK_AREA)}, 
+by = .(REG,VAR, YR)]
+uncer_raw
+dat7_1[,MET:= 7]
+dat7_1[,PAR:= 1]
+dat7_1[, ID:= paste0(MET, "_", PAR)]
+setcolorder(dat7_1, neworder = colnames(uncer_raw))
+uncer_raw <- rbind(uncer_raw, dat7_1)
 
 ######################### TILES AREA vs YEARS wo NOISE #########################
 
