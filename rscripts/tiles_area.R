@@ -21,11 +21,9 @@ uncer_raw[, RANK_AREA:= rank(AREA, na.last = FALSE), by = .(REG, ID, var)]
 colnames(uncer_raw) <- c("REG", "VAR", "YR", "SEVERITY", "AREA", "MET", "PAR", "ID", "RANK_SEV", "RANK_AREA")
 ###### ID 7_1 ######
 
-uncer_raw[ID %in% c("8_1", "7_2", "6_1")]
-dat7_1 <- uncer_raw[, {SEVERITY = mean(SEVERITY); AREA = mean(AREA); RANK_SEV = mean(RANK_SEV); 
+dat7_1 <- uncer_raw[ID %in% c("8_1", "7_2", "6_1"), {SEVERITY = mean(SEVERITY); AREA = mean(AREA); RANK_SEV = mean(RANK_SEV); 
 RANK_AREA = mean(RANK_AREA); list(SEVERITY = SEVERITY, AREA = AREA, RANK_SEV = RANK_SEV, RANK_AREA = RANK_AREA)}, 
 by = .(REG,VAR, YR)]
-uncer_raw
 dat7_1[,MET:= 7]
 dat7_1[,PAR:= 1]
 dat7_1[, ID:= paste0(MET, "_", PAR)]
@@ -47,7 +45,7 @@ ggplot(uncer_raw[REG == "CEU" & VAR == "s" & RANK_AREA > 240,]) +
 
 ######################### TILES AREA vs YEARS wo NOISE #########################
 
-####### CEU Soil drought / Area ######
+######################### CEU Soil drought / Area ##############################
 uncer_noise_area <- uncer_raw[RANK_AREA > 225,]
 uncer_noise_area[,NOISE:= .N, by = .(YR, REG, VAR)]
 
@@ -62,9 +60,12 @@ ggplot(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]) +
   theme(strip.text = element_text(colour = '#ED8810'),
         legend.position = "bottom") +
   panel_border(colour = "black")
-################ RAW #####
+
+######################### CEU Soil drought / Area ##############################
 years_ceu_s <- unique(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
 years_ceu_q <- unique(uncer_noise_area[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
+years_med_s <- unique(uncer_noise_area[REG == "MED" & VAR == "s" & NOISE > 10,]$YR)
+years_med_q <- unique(uncer_noise_area[REG == "MED" & VAR == "q" & NOISE > 10,]$YR)
 
 ceu_s <- ggplot(uncer_raw[REG == "CEU" & VAR == "s" & RANK_AREA >= 125 & YR %in% years_ceu_s,]) +
   geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_AREA, breaks = c(125, 224, 247, 250))), colour = "white") +
@@ -117,11 +118,19 @@ tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
 tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_ceu <- intersect(years_ceu_q, years_ceu_s)
+common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "#E00E1C"]
+tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 1.5]
+tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
+#tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 2]
+#tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
+#tab_col_ceu2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_ceu3 <- tab_col_ceu2[order(tab_col_ceu2$ORD)]
 
 fills_ceu <- tab_col_ceu3$AREA_COL
 frames_ceu <- tab_col_ceu3$COM_COL
+#frames_ceu_lty <- tab_col_ceu3$COM_LTY
+frames_ceu_thi <- tab_col_ceu3$COM_THI
 
 k <- 1
 for (i in stript) {
@@ -140,7 +149,8 @@ k <- 1
 for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
   j <- which(grepl('border', ceu_s_g$grobs[[i]]$childrenOrder))
   ceu_s_g$grobs[[i]]$children[[j]]$gp$col <- frames_ceu[k]
-  ceu_s_g$grobs[[i]]$children[[j]]$gp$lwd <- 7
+  ceu_s_g$grobs[[i]]$children[[j]]$gp$lwd <- frames_ceu_thi[k]
+  #ceu_s_g$grobs[[i]]$children[[j]]$gp$lty <- frames_ceu_lty[k]
   k <- k+1
 }
 
@@ -148,6 +158,8 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(ceu_s_g)
 
 ############ MED Soil drought / Area ##########
+years_ceu_s <- unique(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
+years_ceu_q <- unique(uncer_noise_area[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
 years_med_s <- unique(uncer_noise_area[REG == "MED" & VAR == "s" & NOISE > 10,]$YR)
 years_med_q <- unique(uncer_noise_area[REG == "MED" & VAR == "q" & NOISE > 10,]$YR)
 
@@ -202,11 +214,19 @@ tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
 tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_med <- intersect(years_med_q, years_med_s)
+common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_med2[YR %in% common_years_med, COM_COL:= "#E00E1C"]
+tab_col_med2[YR %in% common_years_med, COM_THI:= 1.5]
+tab_col_med2[YR %in% common_all, COM_THI:= 4]
+#tab_col_med2[YR %in% common_years_med, COM_LTY:= 2]
+#tab_col_med2[YR %in% common_all, COM_LTY:= 1]
+#tab_col_med2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_med3 <- tab_col_med2[order(tab_col_med2$ORD)]
 
 fills_med <- tab_col_med3$AREA_COL
 frames_med <- tab_col_med3$COM_COL
+#frames_med_lty <- tab_col_med3$COM_LTY
+frames_med_thi <- tab_col_med3$COM_THI
 
 k <- 1
 for (i in stript) {
@@ -225,7 +245,8 @@ k <- 1
 for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
     j <- which(grepl('border', med_s_g$grobs[[i]]$childrenOrder))
     med_s_g$grobs[[i]]$children[[j]]$gp$col <- frames_med[k]
-    med_s_g$grobs[[i]]$children[[j]]$gp$lwd <- 7
+    med_s_g$grobs[[i]]$children[[j]]$gp$lwd <- frames_med_thi[k]
+    #med_s_g$grobs[[i]]$children[[j]]$gp$lty <- frames_med_lty[k]
     k <- k+1
 }
 
@@ -233,7 +254,10 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(med_s_g)
 
 ##################### CEU Discharge drought / Area #############################
+years_ceu_s <- unique(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
 years_ceu_q <- unique(uncer_noise_area[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
+years_med_s <- unique(uncer_noise_area[REG == "MED" & VAR == "s" & NOISE > 10,]$YR)
+years_med_q <- unique(uncer_noise_area[REG == "MED" & VAR == "q" & NOISE > 10,]$YR)
 
 ceu_q <- ggplot(uncer_raw[REG == "CEU" & VAR == "q" & RANK_AREA >= 125 & YR %in% years_ceu_q,]) +
   geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_AREA, breaks = c(125, 224, 247, 250))), colour = "white") +
@@ -286,11 +310,19 @@ tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
 tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_ceu <- intersect(years_ceu_q, years_ceu_s)
+common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "#E00E1C"]
+tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 1.5]
+tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
+#tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 2]
+#tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
+#tab_col_ceu2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_ceu3 <- tab_col_ceu2[order(tab_col_ceu2$ORD)]
 
 fills_ceu <- tab_col_ceu3$AREA_COL
 frames_ceu <- tab_col_ceu3$COM_COL
+#frames_ceu_lty <- tab_col_ceu3$COM_LTY
+frames_ceu_thi <- tab_col_ceu3$COM_THI
 
 k <- 1
 for (i in stript) {
@@ -309,7 +341,8 @@ k <- 1
 for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
   j <- which(grepl('border', ceu_q_g$grobs[[i]]$childrenOrder))
   ceu_q_g$grobs[[i]]$children[[j]]$gp$col <- frames_ceu[k]
-  ceu_q_g$grobs[[i]]$children[[j]]$gp$lwd <- 7
+  ceu_q_g$grobs[[i]]$children[[j]]$gp$lwd <- frames_ceu_thi[k]
+  #ceu_q_g$grobs[[i]]$children[[j]]$gp$lty <- frames_ceu_lty[k]
   k <- k+1
 }
 
@@ -317,6 +350,9 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(ceu_q_g)
 
 ######################### MED Discharge drought / Area #########################
+years_ceu_s <- unique(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
+years_ceu_q <- unique(uncer_noise_area[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
+years_med_s <- unique(uncer_noise_area[REG == "MED" & VAR == "s" & NOISE > 10,]$YR)
 years_med_q <- unique(uncer_noise_area[REG == "MED" & VAR == "q" & NOISE > 10,]$YR)
 
 med_q <- ggplot(uncer_raw[REG == "MED" & VAR == "q" & RANK_AREA >= 125 & YR %in% years_med_q,]) +
@@ -370,11 +406,19 @@ tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
 tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_med <- intersect(years_med_q, years_med_s)
+common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_med2[YR %in% common_years_med, COM_COL:= "#E00E1C"]
+tab_col_med2[YR %in% common_years_med, COM_THI:= 1.5]
+tab_col_med2[YR %in% common_all, COM_THI:= 4]
+#tab_col_med2[YR %in% common_years_med, COM_LTY:= 2]
+#tab_col_med2[YR %in% common_all, COM_LTY:= 1]
+#tab_col_med2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_med3 <- tab_col_med2[order(tab_col_med2$ORD)]
 
 fills_med <- tab_col_med3$AREA_COL
 frames_med <- tab_col_med3$COM_COL
+#frames_med_lty <- tab_col_med3$COM_LTY
+frames_med_thi <- tab_col_med3$COM_THI
 
 k <- 1
 for (i in stript) {
@@ -393,7 +437,8 @@ k <- 1
 for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
   j <- which(grepl('border', med_q_g$grobs[[i]]$childrenOrder))
   med_q_g$grobs[[i]]$children[[j]]$gp$col <- frames_med[k]
-  med_q_g$grobs[[i]]$children[[j]]$gp$lwd <- 7
+  med_q_g$grobs[[i]]$children[[j]]$gp$lwd <- frames_med_thi[k]
+  #med_q_g$grobs[[i]]$children[[j]]$gp$lty <- frames_med_lty[k]
   k <- k+1
 }
 
@@ -408,4 +453,3 @@ grid.newpage()
 grid.draw(gtable::gtable_matrix("demo", mat, unit(c(1, 1), "null"), unit(c(1, 1), "null"), z = z))
 
 #ggsave(filename = "area.pdf", device = "pdf", dpi = 300, units = "mm", width = 297,height = 210)
-
