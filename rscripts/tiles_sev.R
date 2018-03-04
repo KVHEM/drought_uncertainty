@@ -376,7 +376,7 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 point_ceu_q <- ggplot(data.frame(YR = years_ceu_q, EVENT = rep(x = 0, times = length(years_ceu_q)))) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
   geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
-  ggtitle("CEU Discharge drought / Area") +
+  ggtitle("CEU Discharge drought / Severity") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
