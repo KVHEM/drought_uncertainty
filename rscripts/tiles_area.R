@@ -73,7 +73,7 @@ ceu_s <- ggplot(uncer_raw[REG == "CEU" & VAR == "s" & RANK_AREA >= 125 & YR %in%
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
   scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
-  ggtitle("CEU Soil drought / Area") +
+  #ggtitle("CEU Soil drought / Area") +
   theme(strip.text = element_text(colour = '#ED8810'),
         legend.position = "none", 
         axis.title = element_text(size = 7),
@@ -102,14 +102,14 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_ceu <- uncer_raw[REG == "CEU" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= "#EBEBEB"]
+tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= "#999999"]
 tab_col_ceu[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
 tab_col_ceu[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
 tab_col_ceu[RANK_SEV > 247 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 #tab_col_ceu[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
 #tab_col_ceu[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_ceu[RANK_AREA <= 125, AREA_COL:= "#EBEBEB"]
+tab_col_ceu[RANK_AREA <= 125, AREA_COL:= "#999999"]
 tab_col_ceu[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
 tab_col_ceu[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
 tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
@@ -157,6 +157,24 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.newpage()
 #grid.draw(ceu_s_g)
 
+############################ POINT CEU S #######################################
+
+point_ceu_s <- ggplot(data.frame(YR = years_ceu_s, EVENT = rep(x = 0, times = length(years_ceu_s)))) +
+  geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
+  ggtitle("CEU Soil drought / Area") +
+  theme(axis.line = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title = element_text(size = 7),
+        axis.text = element_text(size = 6)) +
+  scale_x_continuous(breaks = c(1766, 1800, 1850, 1900, 1950, 2000, 2015), 
+                     labels = c('1766', '1800', '1850', '1900', '1950', '2000', '2015')) +
+  scale_color_manual(values = tab_col_ceu2[order(tab_col_ceu2$YR)]$AREA_COL, guide = FALSE) +
+  coord_cartesian(expand = FALSE)
+
+point_ceu_s_g <- ggplot_gtable(ggplot_build(point_ceu_s))
+
 ############ MED Soil drought / Area ##########
 years_ceu_s <- unique(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
 years_ceu_q <- unique(uncer_noise_area[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
@@ -169,7 +187,7 @@ med_s <- ggplot(uncer_raw[REG == "MED" & VAR == "s" & RANK_AREA >= 125 & YR %in%
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
   scale_fill_viridis("RANK", option = "D", direction = 1, discrete = T) +
-  ggtitle("MED Soil drought / Area") +
+  #ggtitle("MED Soil drought / Area") +
   theme(strip.text = element_text(colour = '#ED8810'),
         legend.position = "none", 
         axis.title = element_text(size = 7),
@@ -198,14 +216,14 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_med <- uncer_raw[REG == "MED" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_med[RANK_SEV <= 125 ,SEV_COL:= "#EBEBEB"]
+tab_col_med[RANK_SEV <= 125 ,SEV_COL:= "#999999"]
 tab_col_med[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
 tab_col_med[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
 tab_col_med[RANK_SEV > 250 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 #tab_col_med[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
 #tab_col_med[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_med[RANK_AREA <= 125, AREA_COL:= "#EBEBEB"]
+tab_col_med[RANK_AREA <= 125, AREA_COL:= "#999999"]
 tab_col_med[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
 tab_col_med[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
 tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
@@ -253,6 +271,24 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.newpage()
 #grid.draw(med_s_g)
 
+############################ POINT MED S #######################################
+
+point_med_s <- ggplot(data.frame(YR = years_med_s, EVENT = rep(x = 0, times = length(years_med_s)))) +
+  geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
+  ggtitle("MED Soil drought / Area") +
+  theme(axis.line = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title = element_text(size = 7),
+        axis.text = element_text(size = 6)) +
+  scale_x_continuous(breaks = c(1766, 1800, 1850, 1900, 1950, 2000, 2015), 
+                     labels = c('1766', '1800', '1850', '1900', '1950', '2000', '2015')) +
+  scale_color_manual(values = tab_col_med2[order(tab_col_med2$YR)]$AREA_COL, guide = FALSE) +
+  coord_cartesian(expand = FALSE)
+
+point_med_s_g <- ggplot_gtable(ggplot_build(point_med_s))
+
 ##################### CEU Discharge drought / Area #############################
 years_ceu_s <- unique(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
 years_ceu_q <- unique(uncer_noise_area[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
@@ -265,7 +301,7 @@ ceu_q <- ggplot(uncer_raw[REG == "CEU" & VAR == "q" & RANK_AREA >= 125 & YR %in%
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
   scale_fill_viridis("RANK", option = "D",direction = 1, discrete = T) +
-  ggtitle("CEU Discharge drought / Area") +
+  #ggtitle("CEU Discharge drought / Area") +
   theme(strip.text = element_text(colour = '#ED8810'),
         legend.position = "none", 
         axis.title = element_text(size = 7),
@@ -294,14 +330,14 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_ceu <- uncer_raw[REG == "CEU" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= "#EBEBEB"]
+tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= "#999999"]
 tab_col_ceu[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
 tab_col_ceu[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
 tab_col_ceu[RANK_SEV > 247 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 #tab_col_ceu[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
 #tab_col_ceu[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_ceu[RANK_AREA <= 125, AREA_COL:= "#EBEBEB"]
+tab_col_ceu[RANK_AREA <= 125, AREA_COL:= "#999999"]
 tab_col_ceu[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
 tab_col_ceu[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
 tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
@@ -349,6 +385,24 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.newpage()
 #grid.draw(ceu_q_g)
 
+############################ POINT CEU Q #######################################
+
+point_ceu_q <- ggplot(data.frame(YR = years_ceu_q, EVENT = rep(x = 0, times = length(years_ceu_q)))) +
+  geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
+  ggtitle("CEU Discharge drought / Area") +
+  theme(axis.line = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title = element_text(size = 7),
+        axis.text = element_text(size = 6)) +
+  scale_x_continuous(breaks = c(1766, 1800, 1850, 1900, 1950, 2000, 2015), 
+                     labels = c('1766', '1800', '1850', '1900', '1950', '2000', '2015')) +
+  scale_color_manual(values = tab_col_ceu2[order(tab_col_ceu2$YR)]$AREA_COL, guide = FALSE) +
+  coord_cartesian(expand = FALSE)
+
+point_ceu_q_g <- ggplot_gtable(ggplot_build(point_ceu_q))
+
 ######################### MED Discharge drought / Area #########################
 years_ceu_s <- unique(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
 years_ceu_q <- unique(uncer_noise_area[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
@@ -361,7 +415,7 @@ med_q <- ggplot(uncer_raw[REG == "MED" & VAR == "q" & RANK_AREA >= 125 & YR %in%
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
   scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
-  ggtitle("MED Discharge drought / Area") +
+  #ggtitle("MED Discharge drought / Area") +
   theme(strip.text = element_text(colour = '#ED8810'),
         legend.position = "none", 
         axis.title = element_text(size = 7),
@@ -390,14 +444,14 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_med <- uncer_raw[REG == "MED" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_med[RANK_SEV <= 125 ,SEV_COL:= "#EBEBEB"]
+tab_col_med[RANK_SEV <= 125 ,SEV_COL:= "#999999"]
 tab_col_med[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
 tab_col_med[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
 tab_col_med[RANK_SEV > 250 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 #tab_col_med[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
 #tab_col_med[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_med[RANK_AREA <= 125, AREA_COL:= "#EBEBEB"]
+tab_col_med[RANK_AREA <= 125, AREA_COL:= "#999999"]
 tab_col_med[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
 tab_col_med[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
 tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
@@ -445,11 +499,35 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.newpage()
 #grid.draw(med_q_g)
 
-################################################################################
+############################ POINT MED Q #######################################
 
-mat <- matrix(list(ceu_s_g, ceu_q_g, med_s_g, med_q_g), nrow = 2)
-z <- matrix(c(3, 1, 2, 4), nrow = 2)
-grid.newpage()
-grid.draw(gtable::gtable_matrix("demo", mat, unit(c(1, 1), "null"), unit(c(1, 1), "null"), z = z))
+point_med_q <- ggplot(data.frame(YR = years_med_q, EVENT = rep(x = 0, times = length(years_med_q)))) +
+  geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
+  ggtitle("MED Discharge drought / Area") +
+  theme(axis.line = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title = element_text(size = 7),
+        axis.text = element_text(size = 6)) +
+  scale_x_continuous(breaks = c(1766, 1800, 1850, 1900, 1950, 2000, 2015), 
+                     labels = c('1766', '1800', '1850', '1900', '1950', '2000', '2015')) +
+  scale_color_manual(values = tab_col_med2[order(tab_col_med2$YR)]$AREA_COL, guide = FALSE) +
+  coord_cartesian(expand = FALSE)
+
+point_med_q_g <- ggplot_gtable(ggplot_build(point_med_q))
+
+############################ PRINT OUT #########################################
+
+#mat <- matrix(list(ceu_s_g, ceu_q_g, med_s_g, med_q_g), nrow = 2)
+#z <- matrix(c(3, 1, 2, 4), nrow = 2)
+#grid.newpage()
+#grid.draw(gtable::gtable_matrix("demo", mat, unit(c(1, 1), "null"), unit(c(1, 1), "null"), z = z))
 
 #ggsave(filename = "area.pdf", device = "pdf", dpi = 300, units = "mm", width = 297,height = 210)
+
+mat <- matrix(list(point_ceu_s_g, ceu_s_g, point_ceu_q_g, ceu_q_g, point_med_s_g, med_s_g, point_med_q_g, med_q_g), nrow = 4)
+z <- matrix(c(2, 4, 1, 3, 6, 8, 5, 7), nrow = 4, byrow = T)
+grid.newpage()
+grid.draw(gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
+                                heights = unit(c(0.5, 2, 0.5, 2), "null"), z = z))
