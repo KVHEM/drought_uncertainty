@@ -240,12 +240,50 @@ cv_parts_gg_sev(uncer_par, reg = "MED", var= "s")
 library(reshape2) #melt(), dcast() for data reformatting
 library(plyr) #ddply() for data reformatting
 
-uncer_par[rank_sd_sev]
-
-ggplot(uncer_met, aes(x = mean_area, y = sd_area, col = aft_1900)) +
+ggplot(uncer_met[reg == "MED",], aes(x = yr, y = met, col = rank_sev_sd)) +
   geom_tile() +
-  geom_smooth(se = F, span = 1) +
-  xlab("Mean Area (runoff)") +
-  ylab("Area sd (runoff)") +
+  scale_y_continuous(breaks = 1:10) +
+  labs(x="Year", y="meteorological set", color="rank sd(severity) ") +
   theme_bw()+
-  theme(legend.position="none")
+  theme(legend.position="right",
+        #remove plot background
+        plot.background=element_blank(),
+        #remove plot border
+        panel.border=element_blank())
+ggsave('ugly_tiles_med_rank_sev.png')
+
+ggplot(uncer_met[reg == "CEU",], aes(x = yr, y = met, col = rank_sev_sd)) +
+  geom_tile() +
+  scale_y_continuous(breaks = 1:10) +
+  labs(x="Year", y="meteorological set", color="rank sd(severity) ") +
+  theme_bw()+
+  theme(legend.position="right",
+        #remove plot background
+        plot.background=element_blank(),
+        #remove plot border
+        panel.border=element_blank())
+ggsave('ugly_tiles_ceu_rank_sev.png')
+
+ggplot(uncer_met[reg == "MED",], aes(x = yr, y = met, col = rank_area_sd)) +
+  geom_tile() +
+  scale_y_continuous(breaks = 1:10) +
+  labs(x="Year", y="meteorological set", color="rank sd(severity) ") +
+  theme_bw()+
+  theme(legend.position="right",
+        #remove plot background
+        plot.background=element_blank(),
+        #remove plot border
+        panel.border=element_blank())
+ggsave('ugly_tiles_med_rank_area.png')
+
+ggplot(uncer_met[reg == "CEU",], aes(x = yr, y = met, col = rank_area_sd)) +
+  geom_tile() +
+  scale_y_continuous(breaks = 1:10) +
+  labs(x="Year", y="meteorological set", color="rank sd(severity) ") +
+  theme_bw()+
+  theme(legend.position="right",
+        #remove plot background
+        plot.background=element_blank(),
+        #remove plot border
+        panel.border=element_blank())
+ggsave('ugly_tiles_ceu_rank_area.png')

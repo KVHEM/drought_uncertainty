@@ -1,7 +1,7 @@
 library(data.table)
 library(ggplot2)
 
-uncer_raw <- data.table(readRDS("./data/extremity_ens_1_EUR.rds")) 
+uncer_raw <- data.table(readRDS("extremity_ens_1_EUR.rds")) 
 
 #correct area
 uncer_raw[REG == 'MED', AREA := AREA * 1672 / 550, by = .(REG, var)]
@@ -38,8 +38,8 @@ uncer_par <- uncer[, .(severity_sd = sd(severity, na.rm = TRUE),
                        ), by = .(reg, par, var, yr)]
 uncer_met[,rank_sev_sd := rank(severity_sd),by=.(met,var,reg)]
 uncer_met[,rank_area_sd := rank(area_sd),by=.(met,var,reg)]
-uncer_par[,rank_sev_sd := rank(severity_sd),by=.(met,var,reg)]
-uncer_par[,rank_area_sd := rank(area_sd),by=.(met,var,reg)]
+uncer_par[,rank_sev_sd := rank(severity_sd),by=.(par,var,reg)]
+uncer_par[,rank_area_sd := rank(area_sd),by=.(par,var,reg)]
 # calculating sd for each met and par set
 uncer_met_sd <- uncer_met[var!='p', .(sev_sd = sd(severity), 
                                          area_sd = sd(area)), by = .(reg, var, yr)]
