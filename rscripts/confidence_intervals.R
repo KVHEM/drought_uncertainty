@@ -2,7 +2,7 @@ library(data.table); library(ggplot2)
 
 outer_ribbon = c(0.05, 0.95); inner_ribbon = c(0.25, 0.75) # ribbon probs
 
-dta <- readRDS('~/Desktop/uncer/extremity_ens_1_EUR.rds') # data load
+dta <- readRDS('data/extremity_ens_1_EUR.rds') # data load
 dta <- dta[, id := paste(MET, PAR, sep = '-')]
 dta <- dta[(var != 'p') & (REG != 'EUR'),]
 

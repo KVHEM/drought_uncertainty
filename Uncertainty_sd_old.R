@@ -26,20 +26,12 @@ uncer[, rank_area := rank(-area), .(par, met, var, reg)]
 uncer[, rank_sev := rank(-severity), .(par, met, var, reg)]
 uncer[, aft_1900 := yr >= 1900]
 
-
-uncer_met <- uncer[, .(severity_sd = sd(severity, na.rm = TRUE), 
-                       area_sd = sd(area, na.rm = TRUE), severity = mean(severity, na.rm = TRUE), 
+uncer_met <- uncer[, .(severity = mean(severity, na.rm = TRUE), 
                        area = mean(area, na.rm = TRUE)), by = .(reg, met, var, yr)]
 
-uncer_par <- uncer[, .(severity_sd = sd(severity, na.rm = TRUE), 
-                       area_sd = sd(area, na.rm = TRUE),
-                       severity = mean(severity, na.rm = TRUE), 
-                       area = mean(area, na.rm = TRUE)
-                       ), by = .(reg, par, var, yr)]
-uncer_met[,rank_sev_sd := rank(severity_sd),by=.(met,var,reg)]
-uncer_met[,rank_area_sd := rank(area_sd),by=.(met,var,reg)]
-uncer_par[,rank_sev_sd := rank(severity_sd),by=.(met,var,reg)]
-uncer_par[,rank_area_sd := rank(area_sd),by=.(met,var,reg)]
+uncer_par <- uncer[, .(severity = mean(severity, na.rm = TRUE), 
+                       area = mean(area, na.rm = TRUE)), by = .(reg, par, var, yr)]
+
 # calculating sd for each met and par set
 uncer_met_sd <- uncer_met[var!='p', .(sev_sd = sd(severity), 
                                          area_sd = sd(area)), by = .(reg, var, yr)]
@@ -92,67 +84,80 @@ uncer_med_s_all <- uncer_med_s[unique(yr), .(yr, mean_area, sd_area, mean_sev, s
 uncer_med_q_all <- uncer_med_q[unique(yr), .(yr, mean_area, sd_area, mean_sev, sd_sev, aft_1900)] 
 
 
-# # plots
-# ggplot(uncer_ceu_q_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
-#   geom_point() + 
-#   xlab("Year") + 
-#   ylab("Area sd/Mean Area") +
-#   theme_bw()
-# ggsave("uncer_ceu_q_sd_all.png")
-# 
-# ggplot(uncer_ceu_s_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
-#   geom_point() + 
-#   xlab("Year") + 
-#   ylab("Area sd/Mean Area") +
-#   theme_bw()
-# ggsave("uncer_ceu_s_sd_all.png")
-# 
-# ggplot(uncer_med_s_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
-#   geom_point() + 
-#   xlab("Year") + 
-#   ylab("Area sd/Mean Area") +
-#   theme_bw()
-# 
-# ggplot(uncer_med_q_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
-#   geom_point() + 
-#   xlab("Year") + 
-#   ylab("Area sd/Mean Area") +
-#   theme_bw()
-# 
-# ggplot(uncer_ceu_s_all, aes(x = mean_area, y = sd_area, col = aft_1900)) + 
-#   geom_point() + 
-#   geom_smooth(se = F, span = 1) +
-#   xlab("Mean Area (soil moisture)") + 
-#   ylab("Area sd (soil moisture)") +
-#   theme_bw()+
-#   theme(legend.position="none") 
-# ggsave("uncer_ceu_s_sd_all_area.png")
-# 
-# ggplot(uncer_ceu_q_all, aes(x = mean_area, y = sd_area, col = aft_1900)) +
-#   geom_point() +
-#   geom_smooth(se = F, span = 1) +
-#   xlab("Mean Area (runoff)") +
-#   ylab("Area sd (runoff)") +
-#   theme_bw()+
-#   theme(legend.position="none")
-# 
-# ggsave("uncer_ceu_q_sd_all_area.png")
-#
-# ggplot(uncer_ceu_s_all, aes(x = mean_sev, y = sd_sev, col = aft_1900)) + 
-#   geom_point() + 
-#   geom_smooth(se = F, span = 1) +
-#   xlab("Mean Severity (soil moisture)") + 
-#   ylab("Severity sd (soil moisture)") +
-#   theme_bw()+
-#   theme(legend.position="none") 
-# ggsave("uncer_ceu_s_sd_all_sev.png")
-# 
-# ggplot(uncer_ceu_q_all, aes(x = mean_sev, y = sd_sev, col = aft_1900)) + 
-#   geom_point() + 
-#   geom_smooth(se = F, span = 1) +
-#   xlab("Mean Severity (runoff)") + 
-#   ylab("Severity sd (runoff)") +
-#   theme_bw()+
-#   theme(legend.position="none") 
-# ggsave("uncer_ceu_q_sd_all_sev.png")
-# 
+# plots
+ggplot(uncer_ceu_q_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
+  geom_point() + 
+  xlab("Year") + 
+  ylab("Area sd/Mean Area") +
+  theme_bw()
+ggsave("uncer_ceu_q_sd_all.png")
+
+ggplot(uncer_ceu_s_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
+  geom_point() + 
+  xlab("Year") + 
+  ylab("Area sd/Mean Area") +
+  theme_bw()
+ggsave("uncer_ceu_s_sd_all.png")
+
+ggplot(uncer_med_q_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
+  geom_point() + 
+  xlab("Year") + 
+  ylab("Area sd/Mean Area") +
+  theme_bw()
+ggsave("uncer_ceu_q_sd_all.png")
+
+ggplot(uncer_med_s_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
+  geom_point() + 
+  xlab("Year") + 
+  ylab("Area sd/Mean Area") +
+  theme_bw()
+ggsave("uncer_ceu_s_sd_all.png")
+
+ggplot(uncer_med_s_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
+  geom_point() + 
+  xlab("Year") + 
+  ylab("Area sd/Mean Area") +
+  theme_bw()
+
+ggplot(uncer_med_q_all[mean_area > 0.05], aes(x = yr, y = sd_area / mean_area)) + 
+  geom_point() + 
+  xlab("Year") + 
+  ylab("Area sd/Mean Area") +
+  theme_bw()
+
+ggplot(uncer_ceu_s_all, aes(x = mean_area, y = sd_area, col = aft_1900)) + 
+  geom_point() + 
+  geom_smooth(se = F, span = 1) +
+  xlab("Mean Area (soil moisture)") + 
+  ylab("Area sd (soil moisture)") +
+  theme_bw()+
+  theme(legend.position="none") 
+ggsave("uncer_ceu_s_sd_all_area.png")
+
+ggplot(uncer_ceu_q_all, aes(x = mean_area, y = sd_area, col = aft_1900)) + 
+  geom_point() + 
+  geom_smooth(se = F, span = 1) +
+  xlab("Mean Area (runoff)") + 
+  ylab("Area sd (runoff)") +
+  theme_bw()+
+  theme(legend.position="none") 
+ggsave("uncer_ceu_q_sd_all_area.png")
+
+ggplot(uncer_ceu_s_all, aes(x = mean_sev, y = sd_sev, col = aft_1900)) + 
+  geom_point() + 
+  geom_smooth(se = F, span = 1) +
+  xlab("Mean Severity (soil moisture)") + 
+  ylab("Severity sd (soil moisture)") +
+  theme_bw()+
+  theme(legend.position="none") 
+ggsave("uncer_ceu_s_sd_all_sev.png")
+
+ggplot(uncer_ceu_q_all, aes(x = mean_sev, y = sd_sev, col = aft_1900)) + 
+  geom_point() + 
+  geom_smooth(se = F, span = 1) +
+  xlab("Mean Severity (runoff)") + 
+  ylab("Severity sd (runoff)") +
+  theme_bw()+
+  theme(legend.position="none") 
+ggsave("uncer_ceu_q_sd_all_sev.png")
+
