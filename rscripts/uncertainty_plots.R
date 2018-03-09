@@ -96,7 +96,8 @@ sd_parts_gg_area <- function(data, reg, var){
   save_name <- paste(paste(datain[1:2],collapse="_"),"sd",var,reg,"area.png",collapse="_")
   
   ggplot(data[reg==reg& var==var,], aes(x = yr, y = area_sd)) +
-    geom_line(aes(color=my_fac)) +
+    #geom_line(aes(color=my_fac)) +
+    geom_smooth(aes(color=my_fac),se = F,span = 0.3, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title,title=reg) +
     theme_bw()+
     scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
@@ -125,9 +126,10 @@ sd_parts_gg_sev <- function(data, reg, var){
   }else{
     my_fac =factor(data$par)
   }
-         
+  
   ggplot(data[reg==reg& var==var,], aes(x = yr, y = severity_sd)) +
-    geom_line(aes(color=my_fac))+
+    #geom_line(aes(color=my_fac))+
+    geom_smooth(aes(color=my_fac),se = F,span = 0.3, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title,title=reg) +
     theme_bw()+
     scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
@@ -179,7 +181,8 @@ cv_parts_gg_area <- function(data, reg, var){
   save_name <- paste(paste(datain[1:2],collapse="_"),"cv",var,reg,"area.png",collapse="_")
   
   ggplot(data[reg==reg& var==var,], aes(x = yr, y = area_sd/area)) +
-    geom_line(aes(color=my_fac)) +
+    #geom_line(aes(color=my_fac)) +
+    geom_smooth(aes(color=my_fac),se = F,span = 0.3, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title,title=reg) +
     theme_bw()+
     scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
@@ -210,7 +213,8 @@ cv_parts_gg_sev <- function(data, reg, var){
   }
   
   ggplot(data[reg==reg& var==var,], aes(x = yr, y = severity_sd/severity)) +
-    geom_line(aes(color=my_fac))+
+    #geom_line(aes(color=my_fac))+
+    geom_smooth(aes(color=my_fac),se = F,span = 0.3, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title,title=reg) +
     theme_bw()+
     scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
@@ -239,51 +243,222 @@ cv_parts_gg_sev(uncer_par, reg = "MED", var= "s")
 
 library(reshape2) #melt(), dcast() for data reformatting
 library(plyr) #ddply() for data reformatting
+# my_cols2 <- colorRampPalette(c("darkred","darkorange","goldenrod")) # 70s return
+my_cols2 <- colorRampPalette(c("blue4","skyblue"))
+rank_sev_tiles_met <- function(reg_sel,var_sel){
+  uncer_met$rank_sev_sd <- cut(uncer_met$rank_sev_sd,
+                            breaks = c(0,50,100,150,200,250),
+                            labels=c("0-50","50-100","100-150","150-200","200-250"))
+  
+  ggplot(uncer_met[reg == reg_sel&var==var_sel,], aes(x = yr, y = met, fill = rank_sev_sd)) +
+    geom_tile() +
+    scale_y_continuous(breaks = 1:10) +
+    labs(x="Year", y="meteorological set", fill="rank sd(severity) ",title=paste0(reg_sel,": ", var_sel)) +
+    theme_bw()+
+    scale_fill_manual(values= my_cols2(5))+
+    theme(legend.position="right",
+          #remove plot background
+          plot.background=element_blank(),
+          #remove plot border
+          panel.border=element_blank())
+  ggsave(paste('tiles',reg_sel,var_sel,'sev_met.png',sep="_"))
+  
+}
 
-ggplot(uncer_met[reg == "MED",], aes(x = yr, y = met, col = rank_sev_sd)) +
-  geom_tile() +
-  scale_y_continuous(breaks = 1:10) +
-  labs(x="Year", y="meteorological set", color="rank sd(severity) ") +
-  theme_bw()+
-  theme(legend.position="right",
-        #remove plot background
-        plot.background=element_blank(),
-        #remove plot border
-        panel.border=element_blank())
-ggsave('ugly_tiles_med_rank_sev.png')
+rank_sev_tiles_met("MED","q")
+rank_sev_tiles_met("CEU","q")
+rank_sev_tiles_met("MED","s")
+rank_sev_tiles_met("CEU","s")
 
-ggplot(uncer_met[reg == "CEU",], aes(x = yr, y = met, col = rank_sev_sd)) +
-  geom_tile() +
-  scale_y_continuous(breaks = 1:10) +
-  labs(x="Year", y="meteorological set", color="rank sd(severity) ") +
-  theme_bw()+
-  theme(legend.position="right",
-        #remove plot background
-        plot.background=element_blank(),
-        #remove plot border
-        panel.border=element_blank())
-ggsave('ugly_tiles_ceu_rank_sev.png')
+rank_area_tiles_met <- function(reg_sel,var_sel){
+  uncer_met$rank_area_sd <- cut(uncer_met$rank_area_sd,
+                               breaks = c(0,50,100,150,200,250),
+                               labels=c("0-50","50-100","100-150","150-200","200-250"))
+  ggplot(uncer_met[reg == reg_sel&var==var_sel,], aes(x = yr, y = met, fill = rank_area_sd)) +
+    geom_tile() +
+    scale_y_continuous(breaks = 1:10) +
+    labs(x="Year", y="meteorological set", fill="rank sd(area) ",title=paste(reg_sel,":", var_sel)) +
+    theme_bw()+
+    scale_fill_manual(values= my_cols2(5))+
+    theme(legend.position="right",
+          #remove plot background
+          plot.background=element_blank(),
+          #remove plot border
+          panel.border=element_blank())
+  ggsave(paste('tiles',reg_sel,var_sel,'area_met.png',sep="_"))
+  
+}
 
-ggplot(uncer_met[reg == "MED",], aes(x = yr, y = met, col = rank_area_sd)) +
-  geom_tile() +
-  scale_y_continuous(breaks = 1:10) +
-  labs(x="Year", y="meteorological set", color="rank sd(severity) ") +
-  theme_bw()+
-  theme(legend.position="right",
-        #remove plot background
-        plot.background=element_blank(),
-        #remove plot border
-        panel.border=element_blank())
-ggsave('ugly_tiles_med_rank_area.png')
+rank_area_tiles_met("MED","q")
+rank_area_tiles_met("CEU","q")
+rank_area_tiles_met("MED","s")
+rank_area_tiles_met("CEU","s")
 
-ggplot(uncer_met[reg == "CEU",], aes(x = yr, y = met, col = rank_area_sd)) +
-  geom_tile() +
-  scale_y_continuous(breaks = 1:10) +
-  labs(x="Year", y="meteorological set", color="rank sd(severity) ") +
-  theme_bw()+
-  theme(legend.position="right",
-        #remove plot background
-        plot.background=element_blank(),
-        #remove plot border
-        panel.border=element_blank())
-ggsave('ugly_tiles_ceu_rank_area.png')
+rank_sev_tiles_par <- function(reg_sel,var_sel){
+  uncer_par$rank_sev_sd <- cut(uncer_par$rank_sev_sd,
+                               breaks = c(0,50,100,150,200,250),
+                               labels=c("0-50","50-100","100-150","150-200","200-250"))
+  ggplot(uncer_par[reg == reg_sel&var==var_sel,], aes(x = yr, y = par, fill = rank_sev_sd)) +
+    geom_tile() +
+    scale_y_continuous(breaks = 1:10) +
+    labs(x="Year", y="parameter set", fill="rank sd(severity) ",title=paste(reg_sel,":", var_sel)) +
+    theme_bw()+
+    scale_fill_manual(values= my_cols2(5))+
+    theme(legend.position="right",
+          #remove plot background
+          plot.background=element_blank(),
+          #remove plot border
+          panel.border=element_blank())
+  ggsave(paste('tiles',reg_sel,var_sel,'sev_par.png',sep="_"))
+  
+}
+
+rank_sev_tiles_par("MED","q")
+rank_sev_tiles_par("CEU","q")
+rank_sev_tiles_par("MED","s")
+rank_sev_tiles_par("CEU","s")
+
+rank_area_tiles_par <- function(reg_sel,var_sel){
+  uncer_par$rank_area_sd <- cut(uncer_par$rank_area_sd,
+                               breaks = c(0,50,100,150,200,250),
+                               labels=c("0-50","50-100","100-150","150-200","200-250"))
+  ggplot(uncer_par[reg == reg_sel&var==var_sel,], aes(x = yr, y = par, fill = rank_area_sd)) +
+    geom_tile() +
+    scale_y_continuous(breaks = 1:10) +
+    labs(x="Year", y="parameter set", fill="rank sd(area) ",title=paste(reg_sel,":", var_sel)) +
+    theme_bw()+
+    scale_fill_manual(values= my_cols2(5))+
+    theme(legend.position="right",
+          #remove plot background
+          plot.background=element_blank(),
+          #remove plot border
+          panel.border=element_blank())
+  ggsave(paste('tiles',reg_sel,var_sel,'area_par.png',sep="_"))
+  
+}
+
+rank_area_tiles_par("MED","q")
+rank_area_tiles_par("CEU","q")
+rank_area_tiles_par("MED","s")
+rank_area_tiles_par("CEU","s")
+
+
+# taylor diagram
+library(plotrix)
+blacols <- my_cols(10)
+taylor.diagram(uncer[reg == "CEU"&var=="q"&met=="1"&par=="1", area], model=uncer[reg == "CEU"&var=="q"&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2])
+
+for(i in 1:10){
+  print(i)
+  for(k in 1:10){
+    if(k==1&i==1|i==1&k==7){
+      
+    }else{
+      taylor.diagram(uncer[reg == "CEU"&var=="q"&met=="1"&par=="1", area], model=uncer[reg == "CEU"&var=="q"&met==as.character(k)&par==as.character(i), area], pos.cor = T,add=T,pch=k,col=blacols[i])
+
+    }
+  }
+}
+
+
+taylor.diagram(uncer[reg == "MED"&var=="q"&met=="1"&par=="1", area], model=uncer[reg == "MED"&var=="q"&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2])
+for(i in 1:10){
+  print(i)
+  for(k in 1:10){
+    if(k==1&i==1|i==1&k==7){
+      
+    }else{
+      taylor.diagram(uncer[reg == "MED"&var=="q"&met=="1"&par=="1", area], model=uncer[reg == "MED"&var=="q"&met==as.character(k)&par==as.character(i), area], pos.cor = T,add=T,pch=k,col=blacols[i])
+      
+    }
+  }
+}
+
+taylor.diagram(uncer[reg == "CEU"&var=="s"&met=="1"&par=="1", area], model=uncer[reg == "CEU"&var=="s"&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2])
+
+for(i in 1:10){
+  print(i)
+  for(k in 1:10){
+    if(k==1&i==1|i==1&k==7){
+      
+    }else{
+      taylor.diagram(uncer[reg == "CEU"&var=="s"&met=="1"&par=="1", area], model=uncer[reg == "CEU"&var=="s"&met==as.character(k)&par==as.character(i), area], pos.cor = T,add=T,pch=k,col=blacols[i])
+      
+    }
+  }
+}
+
+
+taylor.diagram(uncer[reg == "MED"&var=="s"&met=="1"&par=="1", area], model=uncer[reg == "MED"&var=="s"&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2])
+for(i in 1:10){
+  print(i)
+  for(k in 1:10){
+    if(k==1&i==1|i==1&k==7){
+      
+    }else{
+      taylor.diagram(uncer[reg == "MED"&var=="s"&met=="1"&par=="1", area], model=uncer[reg == "MED"&var=="s"&met==as.character(k)&par==as.character(i), area], pos.cor = T,add=T,pch=k,col=blacols[i])
+      
+    }
+  }
+}
+
+###### severity
+
+taylor.diagram(uncer[reg == "CEU"&var=="q"&met=="1"&par=="1"&yr<1900, severity], model=uncer[reg == "CEU"&var=="q"&met=="1"&par=="2"&yr<1900, severity], pos.cor = T, pch=1, col=blacols[2], normalize=T)
+
+for(i in 1:10){
+  print(i)
+  for(k in 1:10){
+    if(k==1&i==1|i==1&k==7){
+      
+    }else{
+      taylor.diagram(uncer[reg == "CEU"&var=="q"&met=="1"&par=="1"&yr<1900, severity], model=uncer[reg == "CEU"&var=="q"&met==as.character(k)&par==as.character(i)&yr<1900, severity], pos.cor = T,add=T,pch=k,col=blacols[i], normalize=T)
+      
+    }
+  }
+}
+
+
+taylor.diagram(uncer[reg == "MED"&var=="q"&met=="1"&par=="1", severity], model=uncer[reg == "MED"&var=="q"&met=="1"&par=="2", severity], pos.cor = T, pch=1, col=blacols[2])
+for(i in 1:10){
+  print(i)
+  for(k in 1:10){
+    if(k==1&i==1|i==1&k==7){
+      
+    }else{
+      taylor.diagram(uncer[reg == "MED"&var=="q"&met=="1"&par=="1", severity], model=uncer[reg == "MED"&var=="q"&met==as.character(k)&par==as.character(i), severity], pos.cor = T,add=T,pch=k,col=blacols[i])
+      
+    }
+  }
+}
+
+taylor.diagram(uncer[reg == "CEU"&var=="s"&met=="1"&par=="1", severity], model=uncer[reg == "CEU"&var=="s"&met=="1"&par=="2", severity], pos.cor = T, pch=1, col=blacols[2])
+
+for(i in 1:10){
+  print(i)
+  for(k in 1:10){
+    if(k==1&i==1|i==1&k==7){
+      
+    }else{
+      taylor.diagram(uncer[reg == "CEU"&var=="s"&met=="1"&par=="1", severity], model=uncer[reg == "CEU"&var=="s"&met==as.character(k)&par==as.character(i), severity], pos.cor = T,add=T,pch=k,col=blacols[i])
+      
+    }
+  }
+}
+
+
+taylor.diagram(uncer[reg == "MED"&var=="s"&met=="1"&par=="1", severity], model=uncer[reg == "MED"&var=="s"&met=="1"&par=="2", severity], pos.cor = T, pch=1, col=blacols[2], normalize=T)
+for(i in 1:10){
+  print(i)
+  for(k in 1:10){
+    if(k==1&i==1|i==1&k==7){
+      
+    }else{
+      taylor.diagram(uncer[reg == "MED"&var=="s"&met=="1"&par=="1", severity], 
+                     model=uncer[reg == "MED"&var=="s"&met==as.character(k)&par==as.character(i), severity], pos.cor = T,add=T,pch=k,col=blacols[i], normalize=T)
+      
+    }
+  }
+}
+
+

@@ -1,7 +1,7 @@
 library(data.table)
 library(ggplot2)
 
-uncer_raw <- data.table(readRDS("extremity_ens_1_EUR.rds")) 
+uncer_raw <- data.table(readRDS("data/extremity_ens_1_EUR.rds")) 
 
 #correct area
 uncer_raw[REG == 'MED', AREA := AREA * 1672 / 550, by = .(REG, var)]
@@ -15,13 +15,13 @@ colnames(uncer) <- c("reg", "var", "yr", "severity", "area", "met", "par") #chan
 uncer[, mean_area := mean(area, na.rm = T), by = .(reg, var, yr)]
 uncer[, sd_area := sd(area, na.rm = T), by = .(reg, var, yr)]
 uncer[, sd_area := sd(area), by = .(reg, var, yr)]
-uncer[, sd_area_par := sd(area), by = .(reg, var, yr, met)] 
-uncer[, sd_area_met := sd(area), by = .(reg, var, yr, par)]
+uncer[, sd_area_par := sd(area), by = .(reg, var, yr, par)] 
+uncer[, sd_area_met := sd(area), by = .(reg, var, yr, met)]
 uncer[, mean_sev := mean(severity, na.rm = T), by = .(reg, var, yr)]
 uncer[, sd_sev := sd(severity, na.rm = T), by = .(reg, var, yr)]
 uncer[, sd_sev := sd(severity), by = .(reg, var, yr)]
-uncer[, sd_sev_par := sd(severity), by = .(reg, var, yr, met)]
-uncer[, sd_sev_met := sd(severity), by = .(reg, var, yr, par)]
+uncer[, sd_sev_par := sd(severity), by = .(reg, var, yr, par)]
+uncer[, sd_sev_met := sd(severity), by = .(reg, var, yr, met)]
 uncer[, rank_area := rank(-area), .(par, met, var, reg)]
 uncer[, rank_sev := rank(-severity), .(par, met, var, reg)]
 uncer[, aft_1900 := yr >= 1900]
