@@ -47,7 +47,9 @@ ggplot(uncer_noise_sev[REG == "CEU" & VAR == "s" & NOISE > 10,]) +
   theme(strip.text = element_text(colour = '#ED8810'),
         legend.position = "bottom") +
   panel_border(colour = "black")
-################ CEU Soil drought / Severity #####
+########################## Literature droughts #################################
+lit_droughts <- c(1540, 1616, 1893, 1921, 2003, 2006, 2007, 2010, 2013, 2015)
+######################### CEU Soil drought / Area ##############################
 years_ceu_s <- unique(uncer_noise_sev[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
 years_ceu_q <- unique(uncer_noise_sev[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
 years_med_s <- unique(uncer_noise_sev[REG == "MED" & VAR == "s" & NOISE > 10,]$YR)
@@ -144,10 +146,15 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(ceu_s_g)
 
 ############################ POINT CEU S #######################################
+flag_droughts <- intersect(x = years_ceu_s, y = lit_droughts)
 
 point_ceu_s <- ggplot(data.frame(YR = years_ceu_s, EVENT = rep(x = 0, times = length(years_ceu_s)))) +
+  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.04), 
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), fill = NA) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
-  geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 3) +
+  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.02, times = length(flag_droughts))), 
+             aes(x = YR, y = Y), shape = 17, col = "#E00E1C") +
   ggtitle("CEU Soil drought / Severity") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
@@ -258,10 +265,15 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(med_s_g)
 
 ############################ POINT MED S #######################################
+flag_droughts <- intersect(x = years_med_s, y = lit_droughts)
 
 point_med_s <- ggplot(data.frame(YR = years_med_s, EVENT = rep(x = 0, times = length(years_med_s)))) +
+  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.04), 
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), fill = NA) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
-  geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 3) +
+  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.02, times = length(flag_droughts))), 
+             aes(x = YR, y = Y), shape = 17, col = "#E00E1C") +
   ggtitle("MED Soil drought / Severity") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
@@ -372,10 +384,15 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(ceu_q_g)
 
 ############################ POINT CEU Q #######################################
+flag_droughts <- intersect(x = years_ceu_q, y = lit_droughts)
 
 point_ceu_q <- ggplot(data.frame(YR = years_ceu_q, EVENT = rep(x = 0, times = length(years_ceu_q)))) +
+  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.04), 
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), fill = NA) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
-  geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 3) +
+  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.02, times = length(flag_droughts))), 
+             aes(x = YR, y = Y), shape = 17, col = "#E00E1C") +
   ggtitle("CEU Discharge drought / Severity") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
@@ -486,10 +503,15 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(med_q_g)
 
 ############################ POINT MED Q #######################################
+flag_droughts <- intersect(x = years_med_q, y = lit_droughts)
 
 point_med_q <- ggplot(data.frame(YR = years_med_q, EVENT = rep(x = 0, times = length(years_med_q)))) +
+  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.04), 
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), fill = NA) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
-  geom_point(aes(x = YR, y = EVENT, color = factor(YR))) +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 3) +
+  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.02, times = length(flag_droughts))), 
+             aes(x = YR, y = Y), shape = 17, col = "#E00E1C") +
   ggtitle("MED Discharge drought / Severity") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
@@ -516,4 +538,4 @@ mat <- matrix(list(point_ceu_s_g, ceu_s_g, point_ceu_q_g, ceu_q_g, point_med_s_g
 z <- matrix(c(2, 4, 1, 3, 6, 8, 5, 7), nrow = 4, byrow = T)
 grid.newpage()
 grid.draw(gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
-                                heights = unit(c(0.5, 2, 0.5, 2), "null"), z = z))
+                                heights = unit(c(0.6, 2, 0.6, 2), "null"), z = z))
