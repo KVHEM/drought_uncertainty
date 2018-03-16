@@ -10,7 +10,7 @@ library(cowplot)
 ############################## PREPARE DATA ####################################
 
 uncer_raw <- data.table(readRDS("D:/RGROUP/DATA/extremity_ens_1_EUR.rds"))
-uncer_raw[is.nan(SEVERITY), AREA:= NaN]
+uncer_raw[AREA == 0, SEVERITY:= 0]
 uncer_raw[REG=='MED', AREA := AREA * 1672/550, by = .(REG, var)]
 uncer_raw[REG=='CEU', AREA := AREA * 1672/1122, by = .(REG, var)]
 uncer_raw[, AREA:=100*AREA]
@@ -29,6 +29,11 @@ dat7_1[,PAR:= 1]
 dat7_1[, ID:= paste0(MET, "_", PAR)]
 setcolorder(dat7_1, neworder = colnames(uncer_raw))
 uncer_raw <- rbind(uncer_raw, dat7_1)
+
+######### COLORS ########
+heavy_rain <- "#225ea8"; strong_rain <- "#41b6c4"; mean_rain <- "#a1dab4"; light_rain <- "#999999"
+strong_drought_s <- '#cc4c02'; mean_drought_s <- '#fe9929'; light_drought_s <- '#fed98e'
+strong_drought_q <- '#e31a1c'; mean_drought_q <- '#fd8d3c'; light_drought_q <- '#fecc5c'
 
 ############################### TILES vs YEARS #################################
 
@@ -73,9 +78,10 @@ ceu_s <- ggplot(uncer_raw[REG == "CEU" & VAR == "s" & RANK_AREA >= 125 & YR %in%
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
-  scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
+  #scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
+  scale_fill_manual(values = c(light_drought_s, mean_drought_s, strong_drought_s)) +
   #ggtitle("CEU Soil drought / Area") +
-  theme(strip.text = element_text(colour = '#ED8810'),
+  theme(strip.text = element_text(colour = 'black'),
         legend.position = "none", 
         axis.title = element_text(size = 7),
         axis.text = element_text(size = 6),
@@ -103,17 +109,17 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_ceu <- uncer_raw[REG == "CEU" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= "#999999"]
-tab_col_ceu[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
-tab_col_ceu[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
-tab_col_ceu[RANK_SEV > 247 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= heavy_rain]
+tab_col_ceu[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= strong_rain]
+tab_col_ceu[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= mean_rain]
+tab_col_ceu[RANK_SEV > 247 & RANK_SEV <= 250 ,SEV_COL:= light_rain]
 #tab_col_ceu[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
 #tab_col_ceu[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_ceu[RANK_AREA <= 125, AREA_COL:= "#999999"]
-tab_col_ceu[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
-tab_col_ceu[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
-tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+tab_col_ceu[RANK_AREA <= 125, AREA_COL:= heavy_rain]
+tab_col_ceu[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= strong_rain]
+tab_col_ceu[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= mean_rain]
+tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= light_rain]
 #tab_col_ceu[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
 #tab_col_ceu[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
@@ -192,9 +198,10 @@ med_s <- ggplot(uncer_raw[REG == "MED" & VAR == "s" & RANK_AREA >= 125 & YR %in%
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
-  scale_fill_viridis("RANK", option = "D", direction = 1, discrete = T) +
+  #scale_fill_viridis("RANK", option = "D", direction = 1, discrete = T) +
+  scale_fill_manual(values = c(light_drought_s, mean_drought_s, strong_drought_s)) +
   #ggtitle("MED Soil drought / Area") +
-  theme(strip.text = element_text(colour = '#ED8810'),
+  theme(strip.text = element_text(colour = 'black'),
         legend.position = "none", 
         axis.title = element_text(size = 7),
         axis.text = element_text(size = 6),
@@ -222,17 +229,17 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_med <- uncer_raw[REG == "MED" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_med[RANK_SEV <= 125 ,SEV_COL:= "#999999"]
-tab_col_med[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
-tab_col_med[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
-tab_col_med[RANK_SEV > 250 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+tab_col_med[RANK_SEV <= 125 ,SEV_COL:= heavy_rain]
+tab_col_med[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= strong_rain]
+tab_col_med[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= mean_rain]
+tab_col_med[RANK_SEV > 250 & RANK_SEV <= 250 ,SEV_COL:= light_rain]
 #tab_col_med[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
 #tab_col_med[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_med[RANK_AREA <= 125, AREA_COL:= "#999999"]
-tab_col_med[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
-tab_col_med[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
-tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+tab_col_med[RANK_AREA <= 125, AREA_COL:= heavy_rain]
+tab_col_med[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= strong_rain]
+tab_col_med[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= mean_rain]
+tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= light_rain]
 #tab_col_med[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
 #tab_col_med[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
@@ -311,9 +318,10 @@ ceu_q <- ggplot(uncer_raw[REG == "CEU" & VAR == "q" & RANK_AREA >= 125 & YR %in%
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
-  scale_fill_viridis("RANK", option = "D",direction = 1, discrete = T) +
+  #scale_fill_viridis("RANK", option = "D",direction = 1, discrete = T) +
+  scale_fill_manual(values = c(light_drought_q, mean_drought_q, strong_drought_q)) +
   #ggtitle("CEU Discharge drought / Area") +
-  theme(strip.text = element_text(colour = '#ED8810'),
+  theme(strip.text = element_text(colour = 'black'),
         legend.position = "none", 
         axis.title = element_text(size = 7),
         axis.text = element_text(size = 6),
@@ -341,17 +349,17 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_ceu <- uncer_raw[REG == "CEU" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= "#999999"]
-tab_col_ceu[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
-tab_col_ceu[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
-tab_col_ceu[RANK_SEV > 247 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+tab_col_ceu[RANK_SEV <= 125 ,SEV_COL:= heavy_rain]
+tab_col_ceu[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= strong_rain]
+tab_col_ceu[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= mean_rain]
+tab_col_ceu[RANK_SEV > 247 & RANK_SEV <= 250 ,SEV_COL:= light_rain]
 #tab_col_ceu[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
 #tab_col_ceu[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_ceu[RANK_AREA <= 125, AREA_COL:= "#999999"]
-tab_col_ceu[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
-tab_col_ceu[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
-tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+tab_col_ceu[RANK_AREA <= 125, AREA_COL:= heavy_rain]
+tab_col_ceu[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= strong_rain]
+tab_col_ceu[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= mean_rain]
+tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= light_rain]
 #tab_col_ceu[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
 #tab_col_ceu[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
@@ -430,9 +438,10 @@ med_q <- ggplot(uncer_raw[REG == "MED" & VAR == "q" & RANK_AREA >= 125 & YR %in%
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
   facet_wrap(~YR, nrow = 3) +
-  scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
+  #scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
+  scale_fill_manual(values = c(light_drought_q, mean_drought_q, strong_drought_q)) +
   #ggtitle("MED Discharge drought / Area") +
-  theme(strip.text = element_text(colour = '#ED8810'),
+  theme(strip.text = element_text(colour = 'black'),
         legend.position = "none", 
         axis.title = element_text(size = 7),
         axis.text = element_text(size = 6),
@@ -460,17 +469,17 @@ yr_vec <- data.frame(YR = as.numeric(yr_vec))
 yr_vec$ORD <- 1:nrow(yr_vec)
 
 tab_col_med <- uncer_raw[REG == "MED" & VAR == "p" & YR %in% yr_vec$YR,]
-tab_col_med[RANK_SEV <= 125 ,SEV_COL:= "#999999"]
-tab_col_med[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= "#440053"]
-tab_col_med[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= "#26908C"]
-tab_col_med[RANK_SEV > 250 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
+tab_col_med[RANK_SEV <= 125 ,SEV_COL:= heavy_rain]
+tab_col_med[RANK_SEV > 125 & RANK_SEV <= 224 ,SEV_COL:= strong_rain]
+tab_col_med[RANK_SEV > 224 & RANK_SEV <= 247 ,SEV_COL:= mean_rain]
+tab_col_med[RANK_SEV > 250 & RANK_SEV <= 250 ,SEV_COL:= light_rain]
 #tab_col_med[RANK_SEV > 240 & RANK_SEV <= 245 ,SEV_COL:= "#5FD166"]
 #tab_col_med[RANK_SEV > 245 & RANK_SEV <= 250 ,SEV_COL:= "#FCF534"]
 
-tab_col_med[RANK_AREA <= 125, AREA_COL:= "#999999"]
-tab_col_med[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= "#440053"]
-tab_col_med[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= "#26908C"]
-tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
+tab_col_med[RANK_AREA <= 125, AREA_COL:= heavy_rain]
+tab_col_med[RANK_AREA > 125 & RANK_AREA <= 224 ,AREA_COL:= strong_rain]
+tab_col_med[RANK_AREA > 224 & RANK_AREA <= 247 ,AREA_COL:= mean_rain]
+tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= light_rain]
 #tab_col_med[RANK_AREA > 240 & RANK_AREA <= 245 ,AREA_COL:= "#5FD166"]
 #tab_col_med[RANK_AREA > 245 & RANK_AREA <= 250 ,AREA_COL:= "#FCF534"]
 
