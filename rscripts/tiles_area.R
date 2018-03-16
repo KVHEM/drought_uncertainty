@@ -127,16 +127,16 @@ tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_ceu <- intersect(years_ceu_q, years_ceu_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "#E00E1C"]
-tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 1.5]
-tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
-#tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 2]
-#tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
-#tab_col_ceu2[is.na(COM_LTY), COM_LTY:=0]
+tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 4]
+#tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
+tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 3]
+tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
+tab_col_ceu2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_ceu3 <- tab_col_ceu2[order(tab_col_ceu2$ORD)]
 
 fills_ceu <- tab_col_ceu3$AREA_COL
 frames_ceu <- tab_col_ceu3$COM_COL
-#frames_ceu_lty <- tab_col_ceu3$COM_LTY
+frames_ceu_lty <- tab_col_ceu3$COM_LTY
 frames_ceu_thi <- tab_col_ceu3$COM_THI
 
 k <- 1
@@ -157,7 +157,7 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
   j <- which(grepl('border', ceu_s_g$grobs[[i]]$childrenOrder))
   ceu_s_g$grobs[[i]]$children[[j]]$gp$col <- frames_ceu[k]
   ceu_s_g$grobs[[i]]$children[[j]]$gp$lwd <- frames_ceu_thi[k]
-  #ceu_s_g$grobs[[i]]$children[[j]]$gp$lty <- frames_ceu_lty[k]
+  ceu_s_g$grobs[[i]]$children[[j]]$gp$lty <- frames_ceu_lty[k]
   k <- k+1
 }
 
@@ -247,16 +247,16 @@ tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_med <- intersect(years_med_q, years_med_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_med2[YR %in% common_years_med, COM_COL:= "#E00E1C"]
-tab_col_med2[YR %in% common_years_med, COM_THI:= 1.5]
-tab_col_med2[YR %in% common_all, COM_THI:= 4]
-#tab_col_med2[YR %in% common_years_med, COM_LTY:= 2]
-#tab_col_med2[YR %in% common_all, COM_LTY:= 1]
-#tab_col_med2[is.na(COM_LTY), COM_LTY:=0]
+tab_col_med2[YR %in% common_years_med, COM_THI:= 4]
+#tab_col_med2[YR %in% common_all, COM_THI:= 4]
+tab_col_med2[YR %in% common_years_med, COM_LTY:= 3]
+tab_col_med2[YR %in% common_all, COM_LTY:= 1]
+tab_col_med2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_med3 <- tab_col_med2[order(tab_col_med2$ORD)]
 
 fills_med <- tab_col_med3$AREA_COL
 frames_med <- tab_col_med3$COM_COL
-#frames_med_lty <- tab_col_med3$COM_LTY
+frames_med_lty <- tab_col_med3$COM_LTY
 frames_med_thi <- tab_col_med3$COM_THI
 
 k <- 1
@@ -277,7 +277,7 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
     j <- which(grepl('border', med_s_g$grobs[[i]]$childrenOrder))
     med_s_g$grobs[[i]]$children[[j]]$gp$col <- frames_med[k]
     med_s_g$grobs[[i]]$children[[j]]$gp$lwd <- frames_med_thi[k]
-    #med_s_g$grobs[[i]]$children[[j]]$gp$lty <- frames_med_lty[k]
+    med_s_g$grobs[[i]]$children[[j]]$gp$lty <- frames_med_lty[k]
     k <- k+1
 }
 
@@ -367,16 +367,16 @@ tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_ceu <- intersect(years_ceu_q, years_ceu_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "#E00E1C"]
-tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 1.5]
-tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
-#tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 2]
-#tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
-#tab_col_ceu2[is.na(COM_LTY), COM_LTY:=0]
+tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 4]
+#tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
+tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 3]
+tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
+tab_col_ceu2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_ceu3 <- tab_col_ceu2[order(tab_col_ceu2$ORD)]
 
 fills_ceu <- tab_col_ceu3$AREA_COL
 frames_ceu <- tab_col_ceu3$COM_COL
-#frames_ceu_lty <- tab_col_ceu3$COM_LTY
+frames_ceu_lty <- tab_col_ceu3$COM_LTY
 frames_ceu_thi <- tab_col_ceu3$COM_THI
 
 k <- 1
@@ -397,7 +397,7 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
   j <- which(grepl('border', ceu_q_g$grobs[[i]]$childrenOrder))
   ceu_q_g$grobs[[i]]$children[[j]]$gp$col <- frames_ceu[k]
   ceu_q_g$grobs[[i]]$children[[j]]$gp$lwd <- frames_ceu_thi[k]
-  #ceu_q_g$grobs[[i]]$children[[j]]$gp$lty <- frames_ceu_lty[k]
+  ceu_q_g$grobs[[i]]$children[[j]]$gp$lty <- frames_ceu_lty[k]
   k <- k+1
 }
 
@@ -487,16 +487,16 @@ tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_med <- intersect(years_med_q, years_med_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_med2[YR %in% common_years_med, COM_COL:= "#E00E1C"]
-tab_col_med2[YR %in% common_years_med, COM_THI:= 1.5]
-tab_col_med2[YR %in% common_all, COM_THI:= 4]
-#tab_col_med2[YR %in% common_years_med, COM_LTY:= 2]
-#tab_col_med2[YR %in% common_all, COM_LTY:= 1]
-#tab_col_med2[is.na(COM_LTY), COM_LTY:=0]
+tab_col_med2[YR %in% common_years_med, COM_THI:= 4]
+#tab_col_med2[YR %in% common_all, COM_THI:= 4]
+tab_col_med2[YR %in% common_years_med, COM_LTY:= 3]
+tab_col_med2[YR %in% common_all, COM_LTY:= 1]
+tab_col_med2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_med3 <- tab_col_med2[order(tab_col_med2$ORD)]
 
 fills_med <- tab_col_med3$AREA_COL
 frames_med <- tab_col_med3$COM_COL
-#frames_med_lty <- tab_col_med3$COM_LTY
+frames_med_lty <- tab_col_med3$COM_LTY
 frames_med_thi <- tab_col_med3$COM_THI
 
 k <- 1
@@ -517,7 +517,7 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
   j <- which(grepl('border', med_q_g$grobs[[i]]$childrenOrder))
   med_q_g$grobs[[i]]$children[[j]]$gp$col <- frames_med[k]
   med_q_g$grobs[[i]]$children[[j]]$gp$lwd <- frames_med_thi[k]
-  #med_q_g$grobs[[i]]$children[[j]]$gp$lty <- frames_med_lty[k]
+  med_q_g$grobs[[i]]$children[[j]]$gp$lty <- frames_med_lty[k]
   k <- k+1
 }
 
