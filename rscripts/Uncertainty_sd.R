@@ -1,7 +1,7 @@
 library(data.table)
 library(ggplot2)
 
-uncer_raw <- data.table(readRDS("data/extremity_ens_1_EUR.rds")) 
+uncer_raw <- data.table(readRDS("extremity_ens_1_EUR.rds")) 
 
 #correct area
 uncer_raw[REG == 'MED', AREA := AREA * 1672 / 550, by = .(REG, var)]

@@ -436,7 +436,7 @@ bar_area_par = function (reg_sel, var_sel){
   ggplot(uncer_par[reg == reg_sel&var==var_sel,], aes(x=met,y=av_rank_area_sd2,fill=aft_1900)) +
     geom_bar(stat = "identity", 
              position=position_dodge()) +
-    geom_errorbar(aes(ymin=av_rank_sev_sd2-sd_rank_sev_sd2,ymax=av_rank_sev_sd2+sd_rank_sev_sd2), width=.2, position=position_dodge(.9))+
+    geom_errorbar(aes(ymin=av_rank_area_sd2-sd_rank_area_sd2,ymax=av_rank_area_sd2+sd_rank_area_sd2), width=.2, position=position_dodge(.9))+
     labs(y="average rank sd(area)", x="meteorological set", fill="after 1900",title=paste(reg_sel,":", var_sel)) +
     theme_bw()+
     scale_y_continuous(breaks = 1:10) +
@@ -472,7 +472,7 @@ bar_area_met = function (reg_sel, var_sel){
   ggplot(uncer_met[reg == reg_sel&var==var_sel,], aes(x=par,y=av_rank_area_sd2,fill=aft_1900)) +
     geom_bar(stat = "identity", 
              position=position_dodge()) +
-    geom_errorbar(aes(ymin=av_rank_sev_sd2-sd_rank_sev_sd2,ymax=av_rank_sev_sd2+sd_rank_sev_sd2), width=.2, position=position_dodge(.9))+
+    geom_errorbar(aes(ymin=av_rank_area_sd2-sd_rank_area_sd2,ymax=av_rank_area_sd2+sd_rank_area_sd2), width=.2, position=position_dodge(.9))+
     labs(y="average rank sd(area)", x="parameter set", fill="after 1900",title=paste(reg_sel,":", var_sel)) +
     theme_bw()+
     scale_y_continuous(breaks = 1:10) +
@@ -509,119 +509,98 @@ bar_area_met("CEU","s")
 # taylor diagram
 library(plotrix)
 blacols <- my_cols(10)
-taylor.diagram(uncer[reg == "CEU"&var=="q"&met=="1"&par=="1", area], model=uncer[reg == "CEU"&var=="q"&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2])
 
-for(i in 1:10){
-  print(i)
-  for(k in 1:10){
-    if(k==1&i==1|i==1&k==7){
-      
-    }else{
-      taylor.diagram(uncer[reg == "CEU"&var=="q"&met=="1"&par=="1", area], model=uncer[reg == "CEU"&var=="q"&met==as.character(k)&par==as.character(i), area], pos.cor = T,add=T,pch=k,col=blacols[i])
+# legend info
+leg.txt1 <- paste("par:", as.character(1:10))
+leg.txt2 <- paste("met:", as.character(1:10))
+png('taylor_legend.png')
+  plot(NULL)
+  legend("left",leg.txt1,lty = 1,col = blacols, bty='n', ncol=5,seg.len=0.55,cex=1.2,lwd=3)
+  legend("topleft",leg.txt2,pch=1:10 , bty='n', ncol=5,cex=1.2)
+dev.off()
 
+taylor_fun_sev <- function(reg_sel,var_sel){
+  save_name <- paste('taylor',reg_sel,var_sel,'sev.png',sep='_')
+  png(save_name)
+  taylor.diagram(uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", severity], model=uncer[reg == reg_sel&var==var_sel&met=="1"&par=="2", severity], pos.cor = T, pch=1, col=blacols[2], normalize=T)
+  for(p in 1:10){
+    print(p)
+    for(m in 1:10){
+      if(m==1&p==1|p==1&m==7){
+        
+      }else{
+        taylor.diagram(uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", severity], 
+                       model=uncer[reg == reg_sel&var==var_sel&met==as.character(m)&par==as.character(p), severity], pos.cor = T,add=T,pch=m,col=blacols[p], normalize=T)
+        
+      }
     }
   }
+  dev.off()
+}
+taylor_fun_area <- function(reg_sel,var_sel){
+  save_name <- paste('taylor',reg_sel,var_sel,'area.png',sep='_')
+  png(save_name)
+  taylor.diagram(uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", area], model=uncer[reg == reg_sel&var==var_sel&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2], normalize=T)
+  for(p in 1:10){
+    print(p)
+    for(m in 1:10){
+      if(m==1&p==1|p==1&m==7){
+        
+      }else{
+        taylor.diagram(uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", area], 
+                       model=uncer[reg == reg_sel&var==var_sel&met==as.character(m)&par==as.character(p), area], pos.cor = T,add=T,pch=m,col=blacols[p], normalize=T)
+        
+      }
+    }
+  }
+  dev.off()
+}
+
+taylor_fun_area("MED","q")
+taylor_fun_area("CEU","q")
+taylor_fun_area("MED","s")
+taylor_fun_area("CEU","s")
+taylor_fun_sev("MED","q")
+taylor_fun_sev("CEU","q")
+taylor_fun_sev("MED","s")
+taylor_fun_sev("CEU","s")
+
+# Comparison met and par
+
+com_par_met_sev <- function(var_sel,reg_sel){
+  aa = (uncer_met[var == var_sel&reg==reg_sel, mean(severity_sd, na.rm = T)]/ uncer_par[var == var_sel&reg==reg_sel, mean(severity_sd, na.rm = T), yr])
+  aa[,yr:=unique(uncer_met$yr)]
+  aa[,fac:=cut(aa$V1,
+               breaks = c(0.125,0.25,0.5,2/3,1,1.5,2,4,8),
+               labels = c("1/4 - 1/8","1/3 - 1/4","1/2 - 1/3","1/2 - 1","1 - 1.5","1.5 - 2","2 - 4","4 - 8"))]
+  my_ratio <- round(length(which(aa$V1>1))/length(which(aa$V1<1)),digits=2)
+  ggplot(aa,aes(x=fac))+
+    geom_histogram(stat='count')+
+    theme_bw()+
+    labs(title = bquote(frac(sigma[met],sigma[par]) ~"="~ .(my_ratio)))
+  ggsave(paste0('hist_comp_',var_sel,reg_sel,'_sev.png'))
+}
+
+com_par_met_area <- function(var_sel,reg_sel){
+  aa = (uncer_met[var == var_sel&reg==reg_sel, mean(area_sd, na.rm = T)]/ uncer_par[var == var_sel&reg==reg_sel, mean(area_sd, na.rm = T), yr])
+  aa[,yr:=unique(uncer_met$yr)]
+  aa[,fac:=cut(aa$V1,
+               breaks = c(0.125,0.25,0.5,2/3,1,1.5,2,4,8),
+               labels = c("1/4 - 1/8","1/3 - 1/4","1/2 - 1/3","1/2 - 1","1 - 1.5","1.5 - 2","2 - 4","4 - 8"))]
+  my_ratio <- round(length(which(aa$V1>1))/length(which(aa$V1<1)),digits=2)
+  ggplot(aa,aes(x=fac))+
+    geom_histogram(stat='count')+
+    theme_bw()+
+    labs(title = bquote(frac(sigma[met],sigma[par]) ~"="~ .(my_ratio)))
+  ggsave(paste0('hist_comp_',var_sel,reg_sel,'_area.png'))
 }
 
 
-taylor.diagram(uncer[reg == "MED"&var=="q"&met=="1"&par=="1", area], model=uncer[reg == "MED"&var=="q"&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2])
-for(i in 1:10){
-  print(i)
-  for(k in 1:10){
-    if(k==1&i==1|i==1&k==7){
-      
-    }else{
-      taylor.diagram(uncer[reg == "MED"&var=="q"&met=="1"&par=="1", area], model=uncer[reg == "MED"&var=="q"&met==as.character(k)&par==as.character(i), area], pos.cor = T,add=T,pch=k,col=blacols[i])
-      
-    }
-  }
-}
-
-taylor.diagram(uncer[reg == "CEU"&var=="s"&met=="1"&par=="1", area], model=uncer[reg == "CEU"&var=="s"&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2])
-
-for(i in 1:10){
-  print(i)
-  for(k in 1:10){
-    if(k==1&i==1|i==1&k==7){
-      
-    }else{
-      taylor.diagram(uncer[reg == "CEU"&var=="s"&met=="1"&par=="1", area], model=uncer[reg == "CEU"&var=="s"&met==as.character(k)&par==as.character(i), area], pos.cor = T,add=T,pch=k,col=blacols[i])
-      
-    }
-  }
-}
-
-
-taylor.diagram(uncer[reg == "MED"&var=="s"&met=="1"&par=="1", area], model=uncer[reg == "MED"&var=="s"&met=="1"&par=="2", area], pos.cor = T, pch=1, col=blacols[2])
-for(i in 1:10){
-  print(i)
-  for(k in 1:10){
-    if(k==1&i==1|i==1&k==7){
-      
-    }else{
-      taylor.diagram(uncer[reg == "MED"&var=="s"&met=="1"&par=="1", area], model=uncer[reg == "MED"&var=="s"&met==as.character(k)&par==as.character(i), area], pos.cor = T,add=T,pch=k,col=blacols[i])
-      
-    }
-  }
-}
-
-###### severity
-
-taylor.diagram(uncer[reg == "CEU"&var=="q"&met=="1"&par=="1"&yr<1900, severity], model=uncer[reg == "CEU"&var=="q"&met=="1"&par=="2"&yr<1900, severity], pos.cor = T, pch=1, col=blacols[2], normalize=T)
-
-for(i in 1:10){
-  print(i)
-  for(k in 1:10){
-    if(k==1&i==1|i==1&k==7){
-      
-    }else{
-      taylor.diagram(uncer[reg == "CEU"&var=="q"&met=="1"&par=="1"&yr<1900, severity], model=uncer[reg == "CEU"&var=="q"&met==as.character(k)&par==as.character(i)&yr<1900, severity], pos.cor = T,add=T,pch=k,col=blacols[i], normalize=T)
-      
-    }
-  }
-}
-
-
-taylor.diagram(uncer[reg == "MED"&var=="q"&met=="1"&par=="1", severity], model=uncer[reg == "MED"&var=="q"&met=="1"&par=="2", severity], pos.cor = T, pch=1, col=blacols[2])
-for(i in 1:10){
-  print(i)
-  for(k in 1:10){
-    if(k==1&i==1|i==1&k==7){
-      
-    }else{
-      taylor.diagram(uncer[reg == "MED"&var=="q"&met=="1"&par=="1", severity], model=uncer[reg == "MED"&var=="q"&met==as.character(k)&par==as.character(i), severity], pos.cor = T,add=T,pch=k,col=blacols[i])
-      
-    }
-  }
-}
-
-taylor.diagram(uncer[reg == "CEU"&var=="s"&met=="1"&par=="1", severity], model=uncer[reg == "CEU"&var=="s"&met=="1"&par=="2", severity], pos.cor = T, pch=1, col=blacols[2])
-
-for(i in 1:10){
-  print(i)
-  for(k in 1:10){
-    if(k==1&i==1|i==1&k==7){
-      
-    }else{
-      taylor.diagram(uncer[reg == "CEU"&var=="s"&met=="1"&par=="1", severity], model=uncer[reg == "CEU"&var=="s"&met==as.character(k)&par==as.character(i), severity], pos.cor = T,add=T,pch=k,col=blacols[i])
-      
-    }
-  }
-}
-
-
-taylor.diagram(uncer[reg == "MED"&var=="s"&met=="1"&par=="1", severity], model=uncer[reg == "MED"&var=="s"&met=="1"&par=="2", severity], pos.cor = T, pch=1, col=blacols[2], normalize=T)
-for(i in 1:10){
-  print(i)
-  for(k in 1:10){
-    if(k==1&i==1|i==1&k==7){
-      
-    }else{
-      taylor.diagram(uncer[reg == "MED"&var=="s"&met=="1"&par=="1", severity], 
-                     model=uncer[reg == "MED"&var=="s"&met==as.character(k)&par==as.character(i), severity], pos.cor = T,add=T,pch=k,col=blacols[i], normalize=T)
-      
-    }
-  }
-}
-
-
+com_par_met_sev('q','CEU')
+com_par_met_sev('s','CEU')
+com_par_met_sev('q','MED')
+com_par_met_sev('s','MED')
+com_par_met_area('q','CEU')
+com_par_met_area('s','CEU')
+com_par_met_area('q','MED')
+com_par_met_area('s','MED')
