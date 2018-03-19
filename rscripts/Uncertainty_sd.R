@@ -11,17 +11,20 @@ uncer_raw[, REG := factor(REG, levels = c('CEU', 'MED', 'EUR'))]
 
 #estimate some stats
 uncer <- uncer_raw 
+
 colnames(uncer) <- c("reg", "var", "yr", "severity", "area", "met", "par") #change var names
+uncer[area==0, severity:=0]
+
 uncer[, mean_area := mean(area, na.rm = T), by = .(reg, var, yr)]
 uncer[, sd_area := sd(area, na.rm = T), by = .(reg, var, yr)]
 uncer[, sd_area := sd(area), by = .(reg, var, yr)]
-uncer[, sd_area_par := sd(area), by = .(reg, var, yr, par)] 
-uncer[, sd_area_met := sd(area), by = .(reg, var, yr, met)]
+uncer[, sd_area_par := sd(area), by = .(reg, var, yr, met)] 
+uncer[, sd_area_met := sd(area), by = .(reg, var, yr, par)]
 uncer[, mean_sev := mean(severity, na.rm = T), by = .(reg, var, yr)]
 uncer[, sd_sev := sd(severity, na.rm = T), by = .(reg, var, yr)]
 uncer[, sd_sev := sd(severity), by = .(reg, var, yr)]
-uncer[, sd_sev_par := sd(severity), by = .(reg, var, yr, par)]
-uncer[, sd_sev_met := sd(severity), by = .(reg, var, yr, met)]
+uncer[, sd_sev_par := sd(severity), by = .(reg, var, yr, met)]
+uncer[, sd_sev_met := sd(severity), by = .(reg, var, yr, par)]
 uncer[, rank_area := rank(-area), .(par, met, var, reg)]
 uncer[, rank_sev := rank(-severity), .(par, met, var, reg)]
 uncer[, aft_1900 := yr >= 1900]
@@ -29,17 +32,49 @@ uncer[, aft_1900 := yr >= 1900]
 
 uncer_met <- uncer[, .(severity_sd = sd(severity, na.rm = TRUE), 
                        area_sd = sd(area, na.rm = TRUE), severity = mean(severity, na.rm = TRUE), 
-                       area = mean(area, na.rm = TRUE)), by = .(reg, met, var, yr)]
+                       area = mean(area, na.rm = TRUE)), by = .(reg, par, var, yr)]
 
 uncer_par <- uncer[, .(severity_sd = sd(severity, na.rm = TRUE), 
                        area_sd = sd(area, na.rm = TRUE),
                        severity = mean(severity, na.rm = TRUE), 
                        area = mean(area, na.rm = TRUE)
-                       ), by = .(reg, par, var, yr)]
-uncer_met[,rank_sev_sd := rank(severity_sd),by=.(met,var,reg)]
-uncer_met[,rank_area_sd := rank(area_sd),by=.(met,var,reg)]
-uncer_par[,rank_sev_sd := rank(severity_sd),by=.(par,var,reg)]
-uncer_par[,rank_area_sd := rank(area_sd),by=.(par,var,reg)]
+                       ), by = .(reg, met, var, yr)]
+# rank of the standard deviation
+uncer_met[,rank_sev_sd := rank(severity_sd),by=.(var,reg, yr)]
+uncer_met[,rank_area_sd := rank(area_sd),by=.(var,reg, yr)]
+uncer_par[,rank_sev_sd := rank(severity_sd),by=.(var,reg, yr)]
+uncer_par[,rank_area_sd := rank(area_sd),by=.(var,reg, yr)]
+uncer_met[,av_rank_sev_sd := mean(rank_sev_sd),by=.(var,reg,par)]
+uncer_met[,av_rank_area_sd := mean(rank_area_sd),by=.(var,reg,par)]
+uncer_par[,av_rank_sev_sd := mean(rank_sev_sd),by=.(var,reg,met)]
+uncer_par[,av_rank_area_sd := mean(rank_area_sd),by=.(var,reg,met)]
+
+# average rank before and after 1900
+uncer_met[yr >= 1900,av_rank_sev_sd2 := mean(rank_sev_sd),by=.(var,reg,par)]
+uncer_met[yr >= 1900,av_rank_area_sd2 := mean(rank_area_sd),by=.(var,reg,par)]
+uncer_par[yr >= 1900,av_rank_sev_sd2 := mean(rank_sev_sd),by=.(var,reg,met)]
+uncer_par[yr >= 1900,av_rank_area_sd2 := mean(rank_area_sd),by=.(var,reg,met)]
+uncer_met[yr < 1900,av_rank_sev_sd2 := mean(rank_sev_sd),by=.(var,reg,par)]
+uncer_met[yr < 1900,av_rank_area_sd2 := mean(rank_area_sd),by=.(var,reg,par)]
+uncer_par[yr < 1900,av_rank_sev_sd2 := mean(rank_sev_sd),by=.(var,reg,met)]
+uncer_par[yr < 1900,av_rank_area_sd2 := mean(rank_area_sd),by=.(var,reg,met)]
+
+# standard deviation of the ranks
+uncer_met[,sd_rank_sev_sd := sd(rank_sev_sd),by=.(var,reg,par)]
+uncer_met[,sd_rank_area_sd := sd(rank_area_sd),by=.(var,reg,par)]
+uncer_par[,sd_rank_sev_sd := sd(rank_sev_sd),by=.(var,reg,met)]
+uncer_par[,sd_rank_area_sd := sd(rank_area_sd),by=.(var,reg,met)]
+uncer_met[yr >= 1900,sd_rank_sev_sd2 := sd(rank_sev_sd),by=.(var,reg,par)]
+uncer_met[yr >= 1900,sd_rank_area_sd2 := sd(rank_area_sd),by=.(var,reg,par)]
+uncer_par[yr >= 1900,sd_rank_sev_sd2 := sd(rank_sev_sd),by=.(var,reg,met)]
+uncer_par[yr >= 1900,sd_rank_area_sd2 := sd(rank_area_sd),by=.(var,reg,met)]
+uncer_met[yr < 1900,sd_rank_sev_sd2 := sd(rank_sev_sd),by=.(var,reg,par)]
+uncer_met[yr < 1900,sd_rank_area_sd2 := sd(rank_area_sd),by=.(var,reg,par)]
+uncer_par[yr < 1900,sd_rank_sev_sd2 := sd(rank_sev_sd),by=.(var,reg,met)]
+uncer_par[yr < 1900,sd_rank_area_sd2 := sd(rank_area_sd),by=.(var,reg,met)]
+
+uncer_par[, aft_1900 := yr >= 1900]
+uncer_met[, aft_1900 := yr >= 1900]
 # calculating sd for each met and par set
 uncer_met_sd <- uncer_met[var!='p', .(sev_sd = sd(severity), 
                                          area_sd = sd(area)), by = .(reg, var, yr)]
