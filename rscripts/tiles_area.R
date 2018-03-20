@@ -31,9 +31,9 @@ setcolorder(dat7_1, neworder = colnames(uncer_raw))
 uncer_raw <- rbind(uncer_raw, dat7_1)
 
 ######### COLORS ########
-heavy_rain <- "#225ea8"; strong_rain <- "#41b6c4"; mean_rain <- "#a1dab4"; light_rain <- "#999999"
-strong_drought_s <- '#cc4c02'; mean_drought_s <- '#fe9929'; light_drought_s <- '#fed98e'
-strong_drought_q <- '#e31a1c'; mean_drought_q <- '#fd8d3c'; light_drought_q <- '#fecc5c'
+heavy_rain <- "#225ea8"; strong_rain <- "#41b6c4"; mean_rain <- "#a1dab4"; light_rain <- "#ffff76"
+strong_drought_s <- '#8b4513'; mean_drought_s <- '#e07020'; light_drought_s <- '#eca776'
+strong_drought_q <- '#ce0d1a'; mean_drought_q <- '#f55b66'; light_drought_q <- '#f9a5ab'
 
 ############################### TILES vs YEARS #################################
 
@@ -66,7 +66,18 @@ ggplot(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]) +
         legend.position = "bottom") +
   panel_border(colour = "black")
 ########################## Literature droughts ##################################
-lit_droughts <- c(1540, 1616, 1893, 1921, 2003, 2006, 2007, 2010, 2013, 2015)
+lit_droughts_ceu_q <- c(1540, 1616, 1893, 1921, 2003, 2006, 2007, 2010, 2013, 2015, #Hanel
+                      1952, 1956, 1976, 1976, 1964, #Spinoni (area)
+                      1950, 1953, 1954, 1959, 1960, 1972:1974, 1983, 1992, 1996:1997, #Spinoni (genereal)
+                      1999:2001, 2004:2005, 2008, 2011) #Spinoni (genereal)
+
+lit_droughts_ceu_s <- c(1540, 1616, 1893, 1921, 2003, 2006, 2007, 2010, 2013, 2015) #Hanel
+
+lit_droughts_med_q <- c(1540, 1616, 1893, 1921, 2003, 2006, 2007, 2010, 2013, 2015, #Hanel
+                      2001, 2005, 2002, 1989, #Spinoni (area)
+                      1950:1954, 1972:1974, 1985, 1989:1991, 1995, 2004:2005, 2008) #Spinoni (genereal)
+
+lit_droughts_med_s <- c(1540, 1616, 1893, 1921, 2003, 2006, 2007, 2010, 2013, 2015) #Hanel
 ######################### CEU Soil drought / Area ##############################
 years_ceu_s <- unique(uncer_noise_area[REG == "CEU" & VAR == "s" & NOISE > 10,]$YR)
 years_ceu_q <- unique(uncer_noise_area[REG == "CEU" & VAR == "q" & NOISE > 10,]$YR)
@@ -81,11 +92,10 @@ ceu_s <- ggplot(uncer_raw[REG == "CEU" & VAR == "s" & RANK_AREA >= 125 & YR %in%
   #scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
   scale_fill_manual(values = c(light_drought_s, mean_drought_s, strong_drought_s)) +
   #ggtitle("CEU Soil drought / Area") +
-  theme(strip.text = element_text(colour = 'black'),
+  theme(strip.text = element_text(size = 15, colour = 'black'),
         legend.position = "none", 
-        axis.title = element_text(size = 7),
-        axis.text = element_text(size = 6),
-        strip.text.x = element_text(size = 7)) +
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18)) +
   panel_border(colour = "black")
 
 ceu_s_g <- ggplot_gtable(ggplot_build(ceu_s))
@@ -126,10 +136,10 @@ tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= light_rain]
 tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_ceu <- intersect(years_ceu_q, years_ceu_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
-tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "#E00E1C"]
-tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 4]
+tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "black"]
+tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 5]
 #tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
-tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 3]
+tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 2]
 tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
 tab_col_ceu2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_ceu3 <- tab_col_ceu2[order(tab_col_ceu2$ORD)]
@@ -165,21 +175,26 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(ceu_s_g)
 
 ############################ POINT CEU S #######################################
-flag_droughts <- intersect(x = years_ceu_s, y = lit_droughts)
+flag_droughts <- intersect(x = years_ceu_s, y = lit_droughts_ceu_s)
+paper_droughts <- lit_droughts_ceu_s[which(lit_droughts_ceu_s > 1765)][!lit_droughts_ceu_s[which(lit_droughts_ceu_s > 1765)] %in% years_ceu_s]
 
 point_ceu_s <- ggplot(data.frame(YR = years_ceu_s, EVENT = rep(x = 0, times = length(years_ceu_s)))) +
-  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.04), 
+  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.05), 
             aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), fill = NA) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
-  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 3) +
-  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.02, times = length(flag_droughts))), 
-             aes(x = YR, y = Y), shape = 17, col = "#E00E1C") +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 12) +
+  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.03, times = length(flag_droughts))), 
+             aes(x = YR, y = Y), shape = 25, fill = "red") +
+  geom_point(data = data.frame(YR = paper_droughts, Y = rep(0.03, times = length(paper_droughts))), 
+             aes(x = YR, y = Y), shape = 16, color = "grey") +
   ggtitle("CEU Soil drought / Area") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        axis.title = element_text(size = 7),
-        axis.text = element_text(size = 6)) +
+        axis.title.y = element_blank(),
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18),
+        plot.title = element_text(size = 25)) +
   scale_x_continuous(breaks = c(1766, 1800, 1850, 1900, 1950, 2000, 2015), 
                      labels = c('1766', '1800', '1850', '1900', '1950', '2000', '2015')) +
   scale_color_manual(values = tab_col_ceu2[order(tab_col_ceu2$YR)]$AREA_COL, guide = FALSE) +
@@ -201,11 +216,10 @@ med_s <- ggplot(uncer_raw[REG == "MED" & VAR == "s" & RANK_AREA >= 125 & YR %in%
   #scale_fill_viridis("RANK", option = "D", direction = 1, discrete = T) +
   scale_fill_manual(values = c(light_drought_s, mean_drought_s, strong_drought_s)) +
   #ggtitle("MED Soil drought / Area") +
-  theme(strip.text = element_text(colour = 'black'),
+  theme(strip.text = element_text(size = 15, colour = 'black'),
         legend.position = "none", 
-        axis.title = element_text(size = 7),
-        axis.text = element_text(size = 6),
-        strip.text.x = element_text(size = 7)) +
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18)) +
   panel_border(colour = "black")
 
 med_s_g <- ggplot_gtable(ggplot_build(med_s))
@@ -246,10 +260,10 @@ tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= light_rain]
 tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_med <- intersect(years_med_q, years_med_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
-tab_col_med2[YR %in% common_years_med, COM_COL:= "#E00E1C"]
-tab_col_med2[YR %in% common_years_med, COM_THI:= 4]
+tab_col_med2[YR %in% common_years_med, COM_COL:= "black"]
+tab_col_med2[YR %in% common_years_med, COM_THI:= 5]
 #tab_col_med2[YR %in% common_all, COM_THI:= 4]
-tab_col_med2[YR %in% common_years_med, COM_LTY:= 3]
+tab_col_med2[YR %in% common_years_med, COM_LTY:= 2]
 tab_col_med2[YR %in% common_all, COM_LTY:= 1]
 tab_col_med2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_med3 <- tab_col_med2[order(tab_col_med2$ORD)]
@@ -285,21 +299,26 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(med_s_g)
 
 ############################ POINT MED S #######################################
-flag_droughts <- intersect(x = years_med_s, y = lit_droughts)
+flag_droughts <- intersect(x = years_med_s, y = lit_droughts_med_s)
+paper_droughts <- lit_droughts_med_s[which(lit_droughts_med_s > 1765)][!lit_droughts_med_s[which(lit_droughts_med_s > 1765)] %in% years_med_s]
 
 point_med_s <- ggplot(data.frame(YR = years_med_s, EVENT = rep(x = 0, times = length(years_med_s)))) +
-  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.04), 
+  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.05), 
             aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), fill = NA) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
-  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 3) +
-  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.02, times = length(flag_droughts))), 
-             aes(x = YR, y = Y), shape = 17, col = "#E00E1C") +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 12) +
+  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.03, times = length(flag_droughts))), 
+             aes(x = YR, y = Y), shape = 25, fill = "red") +
+  geom_point(data = data.frame(YR = paper_droughts, Y = rep(0.03, times = length(paper_droughts))), 
+             aes(x = YR, y = Y), shape = 16, color = "grey") +
   ggtitle("MED Soil drought / Area") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        axis.title = element_text(size = 7),
-        axis.text = element_text(size = 6)) +
+        axis.title.y = element_blank(),
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18),
+        plot.title = element_text(size = 25)) +
   scale_x_continuous(breaks = c(1766, 1800, 1850, 1900, 1950, 2000, 2015), 
                      labels = c('1766', '1800', '1850', '1900', '1950', '2000', '2015')) +
   scale_color_manual(values = tab_col_med2[order(tab_col_med2$YR)]$AREA_COL, guide = FALSE) +
@@ -321,11 +340,10 @@ ceu_q <- ggplot(uncer_raw[REG == "CEU" & VAR == "q" & RANK_AREA >= 125 & YR %in%
   #scale_fill_viridis("RANK", option = "D",direction = 1, discrete = T) +
   scale_fill_manual(values = c(light_drought_q, mean_drought_q, strong_drought_q)) +
   #ggtitle("CEU Discharge drought / Area") +
-  theme(strip.text = element_text(colour = 'black'),
+  theme(strip.text = element_text(size = 15, colour = 'black'),
         legend.position = "none", 
-        axis.title = element_text(size = 7),
-        axis.text = element_text(size = 6),
-        strip.text.x = element_text(size = 7)) +
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18)) +
   panel_border(colour = "black")
 
 ceu_q_g <- ggplot_gtable(ggplot_build(ceu_q))
@@ -366,10 +384,10 @@ tab_col_ceu[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= light_rain]
 tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_ceu <- intersect(years_ceu_q, years_ceu_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
-tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "#E00E1C"]
-tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 4]
+tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "black"]
+tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 5]
 #tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
-tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 3]
+tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 2]
 tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
 tab_col_ceu2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_ceu3 <- tab_col_ceu2[order(tab_col_ceu2$ORD)]
@@ -405,21 +423,26 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(ceu_q_g)
 
 ############################ POINT CEU Q #######################################
-flag_droughts <- intersect(x = years_ceu_q, y = lit_droughts)
+flag_droughts <- intersect(x = years_ceu_q, y = lit_droughts_ceu_q)
+paper_droughts <- lit_droughts_ceu_q[which(lit_droughts_ceu_q > 1765)][!lit_droughts_ceu_q[which(lit_droughts_ceu_q > 1765)] %in% years_ceu_q]
 
 point_ceu_q <- ggplot(data.frame(YR = years_ceu_q, EVENT = rep(x = 0, times = length(years_ceu_q)))) +
-  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.04), 
+  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.05), 
             aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), fill = NA) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
-  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 3) +
-  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.02, times = length(flag_droughts))), 
-             aes(x = YR, y = Y), shape = 17, col = "#E00E1C") +
-  ggtitle("CEU Discharge drought / Area") +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 12) +
+  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.03, times = length(flag_droughts))), 
+             aes(x = YR, y = Y), shape = 25, fill = "red") +
+  geom_point(data = data.frame(YR = paper_droughts, Y = rep(0.03, times = length(paper_droughts))), 
+             aes(x = YR, y = Y), shape = 16, color = "grey") +
+  ggtitle("CEU Runoff drought / Area") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        axis.title = element_text(size = 7),
-        axis.text = element_text(size = 6)) +
+        axis.title.y = element_blank(),
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18),
+        plot.title = element_text(size = 25)) +
   scale_x_continuous(breaks = c(1766, 1800, 1850, 1900, 1950, 2000, 2015), 
                      labels = c('1766', '1800', '1850', '1900', '1950', '2000', '2015')) +
   scale_color_manual(values = tab_col_ceu2[order(tab_col_ceu2$YR)]$AREA_COL, guide = FALSE) +
@@ -441,11 +464,10 @@ med_q <- ggplot(uncer_raw[REG == "MED" & VAR == "q" & RANK_AREA >= 125 & YR %in%
   #scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
   scale_fill_manual(values = c(light_drought_q, mean_drought_q, strong_drought_q)) +
   #ggtitle("MED Discharge drought / Area") +
-  theme(strip.text = element_text(colour = 'black'),
+  theme(strip.text = element_text(size = 15, colour = 'black'),
         legend.position = "none", 
-        axis.title = element_text(size = 7),
-        axis.text = element_text(size = 6),
-        strip.text.x = element_text(size = 7)) +
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18)) +
   panel_border(colour = "black")
 
 med_q_g <- ggplot_gtable(ggplot_build(med_q))
@@ -486,10 +508,10 @@ tab_col_med[RANK_AREA > 247 & RANK_AREA <= 250 ,AREA_COL:= light_rain]
 tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_med <- intersect(years_med_q, years_med_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
-tab_col_med2[YR %in% common_years_med, COM_COL:= "#E00E1C"]
-tab_col_med2[YR %in% common_years_med, COM_THI:= 4]
+tab_col_med2[YR %in% common_years_med, COM_COL:= "black"]
+tab_col_med2[YR %in% common_years_med, COM_THI:= 5]
 #tab_col_med2[YR %in% common_all, COM_THI:= 4]
-tab_col_med2[YR %in% common_years_med, COM_LTY:= 3]
+tab_col_med2[YR %in% common_years_med, COM_LTY:= 2]
 tab_col_med2[YR %in% common_all, COM_LTY:= 1]
 tab_col_med2[is.na(COM_LTY), COM_LTY:=0]
 tab_col_med3 <- tab_col_med2[order(tab_col_med2$ORD)]
@@ -525,21 +547,26 @@ for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
 #grid.draw(med_q_g)
 
 ############################ POINT MED Q #######################################
-flag_droughts <- intersect(x = years_med_q, y = lit_droughts)
+flag_droughts <- intersect(x = years_med_q, y = lit_droughts_med_q)
+paper_droughts <- lit_droughts_med_q[which(lit_droughts_med_q > 1765)][!lit_droughts_med_q[which(lit_droughts_med_q > 1765)] %in% years_med_q]
 
 point_med_q <- ggplot(data.frame(YR = years_med_q, EVENT = rep(x = 0, times = length(years_med_q)))) +
-  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.04), 
+  geom_rect(data = data.frame(xmin = 1764, xmax = 2017, ymin = -0.02, ymax = 0.05), 
             aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), fill = NA) +
   geom_line(data = data.frame(YR = c(1764, 2017), Y = c(0,0)), aes(x = YR, y = Y), size = 0.3, col = "grey") +
-  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 3) +
-  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.02, times = length(flag_droughts))), 
-             aes(x = YR, y = Y), shape = 17, col = "#E00E1C") +
-  ggtitle("MED Discharge drought / Area") +
+  geom_point(aes(x = YR, y = EVENT, color = factor(YR)), shape = "|", lwd = 12) +
+  geom_point(data = data.frame(YR = flag_droughts, Y = rep(0.03, times = length(flag_droughts))), 
+             aes(x = YR, y = Y), shape = 25, fill = "red") +
+  geom_point(data = data.frame(YR = paper_droughts, Y = rep(0.03, times = length(paper_droughts))), 
+             aes(x = YR, y = Y), shape = 16, color = "grey") +
+  ggtitle("MED Runoff drought / Area") +
   theme(axis.line = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        axis.title = element_text(size = 7),
-        axis.text = element_text(size = 6)) +
+        axis.title.y = element_blank(),
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18),
+        plot.title = element_text(size = 25)) +
   scale_x_continuous(breaks = c(1766, 1800, 1850, 1900, 1950, 2000, 2015), 
                      labels = c('1766', '1800', '1850', '1900', '1950', '2000', '2015')) +
   scale_color_manual(values = tab_col_med2[order(tab_col_med2$YR)]$AREA_COL, guide = FALSE) +
