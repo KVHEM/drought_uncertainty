@@ -20,7 +20,7 @@ aux1 <- aux1[, .(val = quantile(val, c(.5, prbs)),
                name = c('ensamble_median', 'rib_1_min', 'rib_2_min', 'rib_2_max', 'rib_1_max')), 
            by = .(REG, var, q)]
 
-aux2 <- dta[PAR==3, .(val = quantile(SEVERITY, q_seq, na.rm = T),
+aux2 <- dta[PAR==8, .(val = quantile(SEVERITY, q_seq, na.rm = T),
                 q = q_seq), 
             by = .(REG, var, id)]
 
@@ -32,7 +32,7 @@ aux2 <- aux2[, .(val = quantile(val, c(.5, prbs)),
 res.conf.int1 <- dcast.data.table(aux1, REG + var + q ~ name, value.var = 'val')
 res.conf.int2 <- dcast.data.table(aux2, REG + var + q ~ name, value.var = 'val')
 res.conf.int1[,set:="10"]
-res.conf.int2[,set:="3"]
+res.conf.int2[,set:="8"]
 
 res.conf.int <- rbind(res.conf.int1,res.conf.int2)
 
@@ -43,13 +43,21 @@ ggplot(res.conf.int, aes(fill=set)) +
   geom_ribbon(aes(x = q, ymin = rib_2_min, ymax = rib_2_max), alpha = .8) +
   geom_line(aes(x = q, y = ensamble_median), lwd = .5) + 
   theme_bw() +
+  scale_fill_manual(values=c("darkorange","royalblue4")) +
+  labs(fill="parameter set")+
   facet_wrap(REG ~ var, scales = 'free', ncol = 2) +
-  labs(x = 'p', y = 'value', title = 'Confidence intervals')
+  labs(x = 'p', y = 'value', title = 'Confidence intervals')+
+  theme(legend.position = "top")
+ggsave("conf_plot_8_10_p.png")
 
-ggplot(res.conf.int) +
-  geom_ribbon(aes(x = -log(-log(q)), ymin = rib_1_min, ymax = rib_1_max), fill = 'steelblue4', alpha = .4) +
-  geom_ribbon(aes(x = -log(-log(q)), ymin = rib_2_min, ymax = rib_2_max), fill = 'steelblue4', alpha = .8) +
-  geom_line(aes(x = -log(-log(q)), y = ensamble_median), col = 'red4', lwd = .5) + 
+ggplot(res.conf.int, aes(fill=set)) +
+  geom_ribbon(aes(x = -log(-log(q)), ymin = rib_1_min, ymax = rib_1_max), alpha = .4) +
+  geom_ribbon(aes(x = -log(-log(q)), ymin = rib_2_min, ymax = rib_2_max), alpha = .8) +
+  geom_line(aes(x = -log(-log(q)), y = ensamble_median), lwd = .5) + 
   theme_bw() +
+  scale_fill_manual(values=c("darkorange","royalblue4")) +
+  labs(fill="parameter set")+
   facet_wrap(REG ~ var, scales = 'free', ncol = 2) +
-  labs(x = 'Gumbel variate', y = 'value', title = 'Confidence intervals')
+  labs(x = 'Gumble variate', y = 'value', title = 'Confidence intervals')+
+  theme(legend.position = "top")
+ggsave("conf_plot_8_10_gumble.png")

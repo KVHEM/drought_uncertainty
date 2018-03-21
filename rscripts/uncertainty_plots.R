@@ -2,9 +2,23 @@
 source("rscripts/Uncertainty_sd.R")
 
 library("RColorBrewer")
-
-library(reshape2) #melt(), dcast() for data reformatting
-library(plyr) #ddply() for data reformatting
+library("plotrix")
+library("reshape2") #melt(), dcast() for data reformatting
+library("plyr") #ddply() for data reformatting
+# colours
+my_cols <- colorRampPalette(c("darkred","darkorange","gold","skyblue","royalblue2","royalblue4"))
+# coeffient of var
+# met sets
+my_cols2 <- colorRampPalette(c("darkred","maroon2","darkorange","khaki3","skyblue","royalblue2","royalblue4"))
+# par sets
+my_cols3 <- colorRampPalette(c("royalblue4","steelblue2","seashell2","gray55","green2","green4")) #"greenyellow",
+# -
+my_cols4 <- colorRampPalette(c("limegreen","forestgreen","darkgreen"))
+#tiles
+# par set
+my_cols5 <- colorRampPalette(c("royalblue4","royalblue2","skyblue"))
+# met set
+my_cols6 <- colorRampPalette(c("darkred","darkorange","khaki2"))
 
 
 # plot coeff of var against mean area
@@ -71,7 +85,7 @@ cv_sev_gg(uncer_med_q_all)
 
 
 # plots sd for each parameter set over time
-my_cols <- colorRampPalette(c("darkred","darkorange","goldenrod","skyblue","royalblue4"))
+
 # cols_val <- gray(seq(0.2, 0.9, length.out = 10))
 
 set_span <- 0.2
@@ -84,8 +98,10 @@ sd_parts_gg_area <- function(data, reg_tmp, var_tmp){
     ylabs <-"runoff: standard deviation (area)"
   }
   if(any(datain=="par")){
+    cols <- my_cols2(10)
     leg.title <-"meteorological set id #"
   }else if (any(datain=="met")){
+    cols <- my_cols3(10)
     leg.title <-"parameter set id #"
   }
   save_name <- paste(paste(datain[1:2],collapse="_"),"sd",var_tmp,reg_tmp,"area.png",sep="_")
@@ -95,8 +111,8 @@ sd_parts_gg_area <- function(data, reg_tmp, var_tmp){
     geom_smooth(aes(colour=as.factor(par)),se = F,span = set_span, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title, title=reg_tmp) +
     theme_bw()+
-    coord_cartesian(ylim=c(2,8))+
-    scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
+    coord_cartesian(ylim=c(0,11))+
+    scale_color_manual(labels = as.character(1:10), values = cols)+
     theme(legend.position="top")
   ggsave(save_name)
 }
@@ -108,8 +124,10 @@ sd_parts_gg_sev <- function(data, reg_tmp, var_tmp){
     ylabs <-"runoff: standard deviation (severity)"
   }
   if(any(datain=="par")){
+    cols <- my_cols2(10)
     leg.title <-"meteorological set id #"
   }else if (any(datain=="met")){
+    cols <- my_cols3(10)
     leg.title <-"parameter set id #"
   }
   
@@ -120,7 +138,7 @@ sd_parts_gg_sev <- function(data, reg_tmp, var_tmp){
     labs(x="Year", y=ylabs, color=leg.title,title=reg_tmp) +
     theme_bw()+
     coord_cartesian(ylim=c(0.0,0.40))+
-    scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
+    scale_color_manual(labels = as.character(1:10), values = cols)+
     theme(legend.position="top")
   ggsave(save_name)
 }
@@ -133,8 +151,10 @@ sd_parts_gg_area_met <- function(data, reg_tmp, var_tmp){
     ylabs <-"runoff: standard deviation (area)"
   }
   if(any(datain=="par")){
+    cols <- my_cols2(10)
     leg.title <-"meteorological set id #"
   }else if (any(datain=="met")){
+    cols <- my_cols3(10)
     leg.title <-"parameter set id #"
   }
   save_name <- paste(paste(datain[1:2],collapse="_"),"sd",var_tmp,reg_tmp,"area.png",sep="_")
@@ -144,8 +164,8 @@ sd_parts_gg_area_met <- function(data, reg_tmp, var_tmp){
     geom_smooth(aes(colour=as.factor(met)),se = F,span = set_span, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title, title=reg_tmp) +
     theme_bw()+
-    coord_cartesian(ylim=c(2,8))+
-    scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
+    coord_cartesian(ylim=c(0,11))+
+    scale_color_manual(labels = as.character(1:10), values = cols)+
     theme(legend.position="top")
   ggsave(save_name)
 }
@@ -157,8 +177,10 @@ sd_parts_gg_sev_met <- function(data, reg_tmp, var_tmp){
     ylabs <-"runoff: standard deviation (severity)"
   }
   if(any(datain=="par")){
+    cols <- my_cols2(10)
     leg.title <-"meteorological set id #"
   }else if (any(datain=="met")){
+    cols <- my_cols3(10)
     leg.title <-"parameter set id #"
   }
   
@@ -169,7 +191,7 @@ sd_parts_gg_sev_met <- function(data, reg_tmp, var_tmp){
     labs(x="Year", y=ylabs, color=leg.title,title=reg_tmp) +
     theme_bw()+
     coord_cartesian(ylim=c(0.0,0.40))+
-    scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
+    scale_color_manual(labels = as.character(1:10), values = cols)+
     theme(legend.position="top")
   ggsave(save_name)
 }
@@ -197,13 +219,15 @@ sd_parts_gg_sev_met(uncer_par, "MED","s")
 cv_parts_gg_area <- function(data, reg_tmp, var_tmp){
   datain <- unlist(strsplit(deparse(substitute(data)),split="_"))
   if(var_tmp=="s"){
-    ylabs <-"soil moisture: coeff. of var. (severity)"
+    ylabs <-"soil moisture: coeff. of var. (area)"
   }else{
-    ylabs <-"runoff: coeff. of var. (severity)"
+    ylabs <-"runoff: coeff. of var. (area)"
   }
   if(any(datain=="par")){
+    cols <- my_cols2(10)
     leg.title <-"meteorological set id #"
   }else if (any(datain=="met")){
+    cols <- my_cols3(10)
     leg.title <-"parameter set id #"
   }
   save_name <- paste(paste(datain[1:2],collapse="_"),"cv",var_tmp,reg_tmp,"area.png",sep="_")
@@ -213,8 +237,8 @@ cv_parts_gg_area <- function(data, reg_tmp, var_tmp){
     geom_smooth(aes(colour=as.factor(par)),se = F,span = set_span, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title, title=reg_tmp) +
     theme_bw()+
-    coord_cartesian(ylim=c(0,0.75))+
-    scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
+    coord_cartesian(ylim=c(0,0.9))+
+    scale_color_manual(labels = as.character(1:10), values = cols)+
     theme(legend.position="top")
   ggsave(save_name)
 }
@@ -226,19 +250,20 @@ cv_parts_gg_sev <- function(data, reg_tmp, var_tmp){
     ylabs <-"runoff: coeff. of var. (severity)"
   }
   if(any(datain=="par")){
+    cols <- my_cols2(10)
     leg.title <-"meteorological set id #"
   }else if (any(datain=="met")){
+    cols <- my_cols3(10)
     leg.title <-"parameter set id #"
   }
-  
   save_name <- paste(paste(datain[1:2],collapse="_"),"cv",var_tmp,reg_tmp,"sev.png",sep="_")
   
   ggplot(data[reg==reg_tmp & var==var_tmp, ], aes(x = yr, y = severity_sd/severity)) +
     geom_smooth(aes(color=as.factor(par)),se = F,span = set_span, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title,title=reg_tmp) +
     theme_bw()+
-    coord_cartesian(ylim=c(0,0.25))+
-    scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
+    coord_cartesian(ylim=c(0,0.4))+
+    scale_color_manual(labels = as.character(1:10), values = cols)+
     theme(legend.position="top")
   ggsave(save_name)
 }
@@ -251,8 +276,10 @@ cv_parts_gg_area_met <- function(data, reg_tmp, var_tmp){
     ylabs <-"runoff: coeff. of var. (severity)"
   }
   if(any(datain=="par")){
+    cols <- my_cols2(10)
     leg.title <-"meteorological set id #"
   }else if (any(datain=="met")){
+    cols <- my_cols3(10)
     leg.title <-"parameter set id #"
   }
   save_name <- paste(paste(datain[1:2],collapse="_"),"cv",var_tmp,reg_tmp,"area.png",sep="_")
@@ -262,8 +289,8 @@ cv_parts_gg_area_met <- function(data, reg_tmp, var_tmp){
     geom_smooth(aes(colour=as.factor(met)),se = F,span = set_span, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title, title=reg_tmp) +
     theme_bw()+
-    coord_cartesian(ylim=c(0,0.75))+
-    scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
+    coord_cartesian(ylim=c(0,0.9))+
+    scale_color_manual(labels = as.character(1:10), values = cols)+
     theme(legend.position="top")
   ggsave(save_name)
 }
@@ -275,19 +302,20 @@ cv_parts_gg_sev_met <- function(data, reg_tmp, var_tmp){
     ylabs <-"runoff: coeff. of var. (severity)"
   }
   if(any(datain=="par")){
+    cols <- my_cols2(10)
     leg.title <-"meteorological set id #"
   }else if (any(datain=="met")){
+    cols <- my_cols3(10)
     leg.title <-"parameter set id #"
   }
-  
   save_name <- paste(paste(datain[1:2],collapse="_"),"cv",var_tmp,reg_tmp,"sev.png",sep="_")
   
   ggplot(data[reg==reg_tmp & var==var_tmp, ], aes(x = yr, y = severity_sd/severity)) +
     geom_smooth(aes(color=as.factor(met)),se = F,span = set_span, method = "loess")+
     labs(x="Year", y=ylabs, color=leg.title,title=reg_tmp) +
     theme_bw()+
-    coord_cartesian(ylim=c(0,0.25))+
-    scale_color_manual(labels = as.character(1:10), values = my_cols(10))+
+    coord_cartesian(ylim=c(0,0.4))+
+    scale_color_manual(labels = as.character(1:10), values = cols)+
     theme(legend.position="top")
   ggsave(save_name)
 }
@@ -314,7 +342,6 @@ cv_parts_gg_sev_met(uncer_par, "MED","s")
 # elegant tiled heat map
 
 # my_cols2 <- colorRampPalette(c("darkred","darkorange","goldenrod")) # 70s return
-my_cols2 <- colorRampPalette(c("blue4","skyblue"))
 rank_sev_tiles_met <- function(reg_sel,var_sel){
   uncer_met$rank_sev_sd <- cut(uncer_met$rank_sev_sd,
                             breaks = c(0,2,4,6,8,10),
@@ -325,7 +352,7 @@ rank_sev_tiles_met <- function(reg_sel,var_sel){
     scale_y_continuous(breaks = 1:10) +
     labs(x="Year", y="parameter set", fill="rank sd(severity) ",title=paste0(reg_sel,": ", var_sel)) +
     theme_bw()+
-    scale_fill_manual(values= my_cols2(5))+
+    scale_fill_manual(values= my_cols5(5))+
     theme(legend.position="right",
           #remove plot background
           plot.background=element_blank(),
@@ -349,7 +376,7 @@ rank_area_tiles_met <- function(reg_sel,var_sel){
     scale_y_continuous(breaks = 1:10) +
     labs(x="Year", y="parameter set", fill="rank sd(area) ",title=paste(reg_sel,":", var_sel)) +
     theme_bw()+
-    scale_fill_manual(values= my_cols2(5))+
+    scale_fill_manual(values= my_cols5(5))+
     theme(legend.position="right",
           #remove plot background
           plot.background=element_blank(),
@@ -373,7 +400,7 @@ rank_sev_tiles_par <- function(reg_sel,var_sel){
     scale_y_continuous(breaks = 1:10) +
     labs(x="Year", y="meteorological set", fill="rank sd(severity) ",title=paste(reg_sel,":", var_sel)) +
     theme_bw()+
-    scale_fill_manual(values= my_cols2(5))+
+    scale_fill_manual(values= my_cols6(5))+
     theme(legend.position="right",
           #remove plot background
           plot.background=element_blank(),
@@ -397,7 +424,7 @@ rank_area_tiles_par <- function(reg_sel,var_sel){
     scale_y_continuous(breaks = 1:10) +
     labs(x="Year", y="meteorological set", fill="rank sd(area) ",title=paste(reg_sel,":", var_sel)) +
     theme_bw()+
-    scale_fill_manual(values= my_cols2(5))+
+    scale_fill_manual(values= my_cols6(5))+
     theme(legend.position="right",
           #remove plot background
           plot.background=element_blank(),
@@ -507,8 +534,8 @@ bar_area_met("MED","s")
 bar_area_met("CEU","s")
 
 # taylor diagram
-library(plotrix)
-blacols <- my_cols(10)
+
+blacols <- my_cols2(10)
 
 # legend info
 leg.txt1 <- paste("par:", as.character(1:10))
@@ -568,11 +595,11 @@ taylor_fun_sev("CEU","s")
 # Comparison met and par
 
 com_par_met_sev <- function(var_sel,reg_sel){
-  aa = (uncer_met[var == var_sel&reg==reg_sel, mean(severity_sd, na.rm = T)]/ uncer_par[var == var_sel&reg==reg_sel, mean(severity_sd, na.rm = T), yr])
+  aa = (uncer_met[var == var_sel&reg==reg_sel, mean(severity_sd, na.rm = T),yr]/ uncer_par[var == var_sel&reg==reg_sel, mean(severity_sd, na.rm = T), yr])
   aa[,yr:=unique(uncer_met$yr)]
   aa[,fac:=cut(aa$V1,
-               breaks = c(0.125,0.25,0.5,2/3,1,1.5,2,4,8),
-               labels = c("1/4 - 1/8","1/3 - 1/4","1/2 - 1/3","1/2 - 1","1 - 1.5","1.5 - 2","2 - 4","4 - 8"))]
+               breaks = c(0,0.125,0.25,0.5,2/3,1,1.5,2,4,8,100),
+               labels = c("< 1:8","1:8 - 1:4","1:4 - 1:2","1:2 - 2:3","2:3 - 1:1","1:1 - 3:2","3:2 - 2:1","2:1 - 4:1","4:1 - 8:1", "> 8:1"))]
   my_ratio <- round(length(which(aa$V1>1))/length(which(aa$V1<1)),digits=2)
   ggplot(aa,aes(x=fac))+
     geom_histogram(stat='count')+
@@ -582,11 +609,11 @@ com_par_met_sev <- function(var_sel,reg_sel){
 }
 
 com_par_met_area <- function(var_sel,reg_sel){
-  aa = (uncer_met[var == var_sel&reg==reg_sel, mean(area_sd, na.rm = T)]/ uncer_par[var == var_sel&reg==reg_sel, mean(area_sd, na.rm = T), yr])
+  aa = (uncer_met[var == var_sel&reg==reg_sel, mean(area_sd, na.rm = T),yr]/ uncer_par[var == var_sel&reg==reg_sel, mean(area_sd, na.rm = T), yr])
   aa[,yr:=unique(uncer_met$yr)]
   aa[,fac:=cut(aa$V1,
-               breaks = c(0.125,0.25,0.5,2/3,1,1.5,2,4,8),
-               labels = c("1/4 - 1/8","1/3 - 1/4","1/2 - 1/3","1/2 - 1","1 - 1.5","1.5 - 2","2 - 4","4 - 8"))]
+               breaks = c(0,0.125,0.25,0.5,2/3,1,1.5,2,4,8,100),
+               labels = c("< 1:8","1:8 - 1:4","1:4 - 1:2","1:2 - 2:3","2:3 - 1:1","1:1 - 3:2","3:2 - 2:1","2:1 - 4:1","4:1 - 8:1", "> 8:1"))]
   my_ratio <- round(length(which(aa$V1>1))/length(which(aa$V1<1)),digits=2)
   ggplot(aa,aes(x=fac))+
     geom_histogram(stat='count')+
@@ -604,3 +631,49 @@ com_par_met_area('q','CEU')
 com_par_met_area('s','CEU')
 com_par_met_area('q','MED')
 com_par_met_area('s','MED')
+
+# histogram of everything 
+
+uncer_met[ ,av_area_sd:=mean(area_sd, na.rm = T),by=.(reg,var,yr)]
+uncer_par[ ,av_area_sd:=mean(area_sd, na.rm = T),by=.(reg,var,yr)]
+uncer_met[ ,av_sev_sd:=mean(severity_sd, na.rm = T),by=.(reg,var,yr)]
+uncer_par[ ,av_sev_sd:=mean(severity_sd, na.rm = T),by=.(reg,var,yr)]
+          
+aa_met1 <- subset(uncer_met[aft_1900==T],select=c(reg,var, yr,av_area_sd))
+aa_met1[,what:="area"]
+aa_met1 <- aa_met1[,unique(av_area_sd),by=.(reg, var, yr,what)]
+aa_met2 <- subset(uncer_met[aft_1900==T],select=c(reg,var, yr,av_sev_sd))
+aa_met2[,what:="sev"]
+aa_met2 <- aa_met2[,unique(av_sev_sd),by=.(reg, var, yr,what)]
+aa_met <- rbind(aa_met1,aa_met2,use.names=F)
+
+
+aa_par1 <- subset(uncer_par[aft_1900==T],select=c(reg,var, yr,av_area_sd))
+aa_par1[,what:="area"]
+aa_par1 <- aa_par1[,unique(av_area_sd),by=.(reg, var, yr,what)]
+aa_par2 <- subset(uncer_par[aft_1900==T],select=c(reg,var, yr,av_sev_sd))
+aa_par2[,what:="sev"]
+aa_par2 <- aa_par2[,unique(av_sev_sd),by=.(reg, var, yr,what)]
+aa_par <- rbind(aa_par1,aa_par2,use.names=F)
+
+aa <- cbind(aa_met,subset(aa_par,select=c(V1)))
+
+names(aa)[c(5,6)] <- c("av_met","av_par")
+
+aa[,comb:=factor(paste(reg,var,what))]
+
+aa[,ratio:= av_met/av_par]
+
+aa[,fac:=cut(aa$ratio,
+             breaks = c(0.25,0.5,2/3,3/4,9/10,1,10/9),
+             labels = c("1:4 - 1:2","1:2 - 2:3","2:3 - 3:4","3:4 - 9:10","9:10 - 1:1","1:1 - 10:9"))]
+#my_ratio <- round(length(which(aa$V1>1))/length(which(aa$V1<1)),digits=2)
+ggplot(aa,aes(x=fac,fill=comb))+
+  geom_histogram(stat='count')+
+  theme_bw()+
+  scale_fill_manual(values=my_cols(8))+
+  labs(x=expression(paste(sigma[met],":",sigma[par])),fill="")
+
+  #labs(title = bquote(frac(sigma[met],sigma[par]) ~"="~ .(my_ratio)))
+ggsave(paste0('hist_comp_all.png'))
+

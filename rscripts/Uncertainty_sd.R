@@ -28,7 +28,7 @@ uncer[, sd_sev_met := sd(severity), by = .(reg, var, yr, par)]
 uncer[, rank_area := rank(-area), .(par, met, var, reg)]
 uncer[, rank_sev := rank(-severity), .(par, met, var, reg)]
 uncer[, aft_1900 := yr >= 1900]
-
+uncer <- uncer[(var != 'p') & (reg != 'EUR'),]
 
 uncer_met <- uncer[, .(severity_sd = sd(severity, na.rm = TRUE), 
                        area_sd = sd(area, na.rm = TRUE), severity = mean(severity, na.rm = TRUE), 
