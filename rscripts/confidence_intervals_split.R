@@ -12,7 +12,7 @@ q_seq <- seq(.1, .99, .01)
 
 prbs <- sort(c(outer_ribbon, inner_ribbon))
 
-aux1 <- dta[PAR==10, .(val = quantile(SEVERITY, q_seq, na.rm = T),
+aux1 <- dta[PAR==10, .(val = quantile(AREA, q_seq, na.rm = T),
                q = q_seq), 
            by = .(REG, var, id)]
 
@@ -20,7 +20,7 @@ aux1 <- aux1[, .(val = quantile(val, c(.5, prbs)),
                name = c('ensamble_median', 'rib_1_min', 'rib_2_min', 'rib_2_max', 'rib_1_max')), 
            by = .(REG, var, q)]
 
-aux2 <- dta[PAR==8, .(val = quantile(SEVERITY, q_seq, na.rm = T),
+aux2 <- dta[PAR==8, .(val = quantile(AREA, q_seq, na.rm = T),
                 q = q_seq), 
             by = .(REG, var, id)]
 
@@ -36,7 +36,13 @@ res.conf.int2[,set:="8"]
 
 res.conf.int <- rbind(res.conf.int1,res.conf.int2)
 
-# head(res.conf.int)
+if(file.exists('figs')){
+  setwd('figs')
+}else{
+  dir.create('figs')
+  setwd('figs')
+}
+
 
 ggplot(res.conf.int, aes(fill=set)) +
   geom_ribbon(aes(x = q, ymin = rib_1_min, ymax = rib_1_max), alpha = .4) +
@@ -47,7 +53,7 @@ ggplot(res.conf.int, aes(fill=set)) +
   labs(fill="parameter set")+
   facet_wrap(REG ~ var, scales = 'free', ncol = 2) +
   labs(x = 'p', y = 'value', title = 'Confidence intervals')+
-  theme(legend.position = "top")
+  theme(legend.position = "top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
 ggsave("conf_plot_8_10_p.png")
 
 ggplot(res.conf.int, aes(fill=set)) +
@@ -59,5 +65,7 @@ ggplot(res.conf.int, aes(fill=set)) +
   labs(fill="parameter set")+
   facet_wrap(REG ~ var, scales = 'free', ncol = 2) +
   labs(x = 'Gumble variate', y = 'value', title = 'Confidence intervals')+
-  theme(legend.position = "top")
+  theme(legend.position = "top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
 ggsave("conf_plot_8_10_gumble.png")
+
+setwd('..')
