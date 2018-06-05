@@ -35,12 +35,12 @@ cv_area_gg <- function(data){
   datain <- unlist(strsplit(deparse(substitute(data)),split="_"))
   if(any(datain=="s")){
     xlabs <- "Mean Area (soil moisture)"
-    ylabs <-"CV (soil moisture)"
+    ylabs <-"CV (Area)"
   }
   else
   {
     xlabs <- "Mean Area (runoff)"
-    ylabs <-"CV (runoff)"
+    ylabs <-"CV (Area)"
   }
   save_name <- paste(paste(datain[1:3],collapse="_"),"_cv_area.png",sep="")
   print(save_name)
@@ -51,7 +51,7 @@ cv_area_gg <- function(data){
     ylab(ylabs) +
     theme_bw()+
     scale_color_manual(labels = c("Before 1900","After 1900"),values = my_cols7(2))+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="top", axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=24))
 
   ggsave(save_name)
 }
@@ -65,13 +65,13 @@ cv_area_gg(uncer_med_q_all)
 cv_sev_gg <- function(data){
   datain <- unlist(strsplit(deparse(substitute(data)),split="_"))
   if(any(datain=="s")){
-    xlabs <- "Mean Sev (soil moisture)"
-    ylabs <-"CV (soil moisture)"
+    xlabs <- "Mean Severity (soil moisture)"
+    ylabs <-"CV (Severity)"
   }
   else
   {
-    xlabs <- "Mean Sev (runoff)"
-    ylabs <-"CV (runoff)"
+    xlabs <- "Mean Severity (runoff)"
+    ylabs <-"CV (Severity)"
   }
   save_name <- paste(paste(datain[1:3],collapse="_"),"_cv_sev.png",sep="")
   print(save_name)
@@ -82,7 +82,7 @@ cv_sev_gg <- function(data){
     ylab(ylabs) +
     theme_bw()+
     scale_color_manual(labels = c("Before 1900","After 1900"),values = my_cols7(2))+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="top", axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=24))
   
   ggsave(save_name)
 }
@@ -118,7 +118,7 @@ sd_parts_gg_area <- function(data, reg_tmp, var_tmp){
     theme_bw()+
     coord_cartesian(ylim=c(0,11))+
     scale_color_manual(labels = as.character(1:10), values = cols)+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="top", axis.text = element_text(size = 20), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=22))
   ggsave(save_name)
 }
 sd_parts_gg_sev <- function(data, reg_tmp, var_tmp){
@@ -140,7 +140,7 @@ sd_parts_gg_sev <- function(data, reg_tmp, var_tmp){
     theme_bw()+
     coord_cartesian(ylim=c(0.0,0.40))+
     scale_color_manual(labels = as.character(1:10), values = cols)+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="top", axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=20))
   ggsave(save_name)
 }
 
@@ -163,7 +163,7 @@ sd_parts_gg_area_met <- function(data, reg_tmp, var_tmp){
     theme_bw()+
     coord_cartesian(ylim=c(0,11))+
     scale_color_manual(labels = as.character(1:10), values = cols)+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="top", axis.text = element_text(size = 20), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=22))
   ggsave(save_name)
 }
 sd_parts_gg_sev_met <- function(data, reg_tmp, var_tmp){
@@ -185,7 +185,7 @@ sd_parts_gg_sev_met <- function(data, reg_tmp, var_tmp){
     theme_bw()+
     coord_cartesian(ylim = c(0.0,0.40))+
     scale_color_manual(labels = as.character(1:10), values = cols)+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="top", axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=20))
   ggsave(save_name)
 }
 
@@ -228,12 +228,12 @@ cv_parts_gg_area <- function(data, reg_tmp, var_tmp){
   ggplot(data[reg == reg_tmp& var==var_tmp,], aes(x = yr, y = area_sd/area)) +
     #geom_line(aes(color=my_fac)) +
     geom_smooth(aes(colour=as.factor(par)),se = F,span = set_span, method = "loess")+
-    labs(x="Year", y=ylabs, color=leg.title, title=paste0(reg_tmp,': ',var_tmp)) +
+    labs(x="Year", y=ylabs, color=leg.title, title="") +
     theme_bw()+
     coord_cartesian(ylim=c(0,0.9))+
     scale_color_manual(labels = as.character(1:10), values = cols)+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))+
-    geom_vline(xintercept = 1900)
+    theme(legend.position="none", axis.text = element_text(size = 20), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=22))
+  geom_vline(xintercept = 1900)
   ggsave(save_name)
 }
 cv_parts_gg_sev <- function(data, reg_tmp, var_tmp){
@@ -258,7 +258,7 @@ cv_parts_gg_sev <- function(data, reg_tmp, var_tmp){
     theme_bw()+
     coord_cartesian(ylim=c(0,0.4))+
     scale_color_manual(labels = as.character(1:10), values = cols)+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="top", axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=20))
   ggsave(save_name)
 }
 
@@ -281,11 +281,11 @@ cv_parts_gg_area_met <- function(data, reg_tmp, var_tmp){
   ggplot(data[reg == reg_tmp& var==var_tmp,], aes(x = yr, y = area_sd/area)) +
     #geom_line(aes(color=my_fac)) +
     geom_smooth(aes(colour = as.factor(met)),se = F,span = set_span, method = "loess")+
-    labs(x="Year", y = ylabs, color = leg.title, title  =paste0(reg_tmp,': ',var_tmp)) +
+    labs(x="Year", y = ylabs, color = leg.title, title  = "") +
     theme_bw()+
     coord_cartesian(ylim=c(0,0.9))+
     scale_color_manual(labels = as.character(1:10), values = cols)+
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="none", axis.text = element_text(size = 20), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=22))
   ggsave(save_name)
 }
 cv_parts_gg_sev_met <- function(data, reg_tmp, var_tmp){
@@ -310,7 +310,7 @@ cv_parts_gg_sev_met <- function(data, reg_tmp, var_tmp){
     theme_bw() +
     coord_cartesian(ylim=c(0,0.4)) +
     scale_color_manual(labels = as.character(1:10), values = cols) +
-    theme(legend.position="top", axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+    theme(legend.position="top", axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=20))
   ggsave(save_name)
 }
 
@@ -351,7 +351,7 @@ rank_sev_tiles_met <- function(reg_sel,var_sel){
           #remove plot background
           plot.background=element_blank(),
           #remove plot border
-          panel.border=element_blank(), axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+          panel.border=element_blank(), axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=20))
   ggsave(paste('tiles',reg_sel,var_sel,'sev_met.png',sep="_"))
   
 }
@@ -375,7 +375,7 @@ rank_area_tiles_met <- function(reg_sel,var_sel){
           #remove plot background
           plot.background=element_blank(),
           #remove plot border
-          panel.border=element_blank(), axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+          panel.border=element_blank(), axis.text = element_text(size = 22), axis.title = element_text(size=22),title = element_text(size=20),legend.text = element_text(size=20))
   ggsave(paste('tiles',reg_sel,var_sel,'area_met.png',sep="_"))
   
 }
@@ -399,7 +399,7 @@ rank_sev_tiles_par <- function(reg_sel,var_sel){
           #remove plot background
           plot.background=element_blank(),
           #remove plot border
-          panel.border=element_blank(), axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+          panel.border=element_blank(), axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=20))
   ggsave(paste('tiles',reg_sel,var_sel,'sev_par.png',sep="_"))
   
 }
@@ -449,7 +449,7 @@ bar_sev_par = function (reg_sel, var_sel){
         #remove plot background
         plot.background=element_blank(),
         #remove plot border
-        panel.border=element_blank(), axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+        panel.border=element_blank(), axis.text = element_text(size = 18), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=20))
 ggsave(paste('barplot_sev',reg_sel,var_sel,'av_rank_par.png',sep="_"))
 }
 
@@ -467,7 +467,7 @@ bar_area_par = function (reg_sel, var_sel){
           #remove plot background
           plot.background=element_blank(),
           #remove plot border
-          panel.border=element_blank(), axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+          panel.border=element_blank(), axis.text = element_text(size = 20), axis.title = element_text(size=22),title = element_text(size=24),legend.text = element_text(size=20))
   ggsave(paste('barplot_area',reg_sel,var_sel,'av_rank_par.png',sep="_"))
 }
 
@@ -485,7 +485,7 @@ bar_sev_met = function (reg_sel, var_sel){
           #remove plot background
           plot.background=element_blank(),
           #remove plot border
-          panel.border=element_blank(), axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+          panel.border=element_blank(), axis.text = element_text(size = 20), axis.title = element_text(size=22),title = element_text(size=24),legend.text = element_text(size=20))
   ggsave(paste('barplot_sev',reg_sel,var_sel,'av_rank_met.png',sep="_"))
 }
 
@@ -503,7 +503,7 @@ bar_area_met = function (reg_sel, var_sel){
           #remove plot background
           plot.background=element_blank(),
           #remove plot border
-          panel.border=element_blank(), axis.text = element_text(size = 16), axis.title = element_text(size=18),title = element_text(size=18),legend.text = element_text(size=18))
+          panel.border=element_blank(), axis.text = element_text(size = 20), axis.title = element_text(size=20),title = element_text(size=20),legend.text = element_text(size=20))
   ggsave(paste('barplot_area',reg_sel,var_sel,'av_rank_met.png',sep="_"))
 }
 
@@ -540,21 +540,22 @@ png('taylor_legend.png')
   legend("topleft",leg.txt2,pch=1:10 , bty='n', ncol=5,cex=1.2)
 dev.off()
 
+source('taylor.R')
 taylor_fun_sev <- function(reg_sel,var_sel){
   save_name <- paste('taylor',reg_sel,var_sel,'sev.png',sep='_')
   png(save_name)
-  taylor.diagram(uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", severity]
+  my_taylor (uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", severity]
                  , model=uncer[reg == reg_sel&var==var_sel&met=="1"&par=="2", severity]
-                 , pos.cor = T, pch=1, col=blacols[2], normalize=T,main = paste0(reg_sel,": ",var_sel," severity"),cex.axis = 1.4)
+                 , pos.cor = T, pch=1, col=blacols[2], normalize=T,main = paste0(reg_sel," ",var_sel," severity"), cex.axis = 1.6, pcex=1.3, show.gamma = T, ref.sd=T, gamma.col='forestgreen')
   for(p in 1:10){
     print(p)
     for(m in 1:10){
       if(m==1&p==1|p==1&m==7){
         
       }else{
-        taylor.diagram(uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", severity], 
+        my_taylor (uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", severity], 
                        model=uncer[reg == reg_sel&var==var_sel&met==as.character(m)&par==as.character(p), severity]
-                       , pos.cor = T,add=T,pch=m,col=blacols[p], normalize=T, main='',cex.axis = 1.4)
+                       , pos.cor = T,add=T,pch=m,col=blacols[p], normalize=T, main='', cex.axis = 1.6, pcex=1.3, show.gamma = T, ref.sd=T, gamma.col='forestgreen')
         
       }
     }
@@ -564,17 +565,17 @@ taylor_fun_sev <- function(reg_sel,var_sel){
 taylor_fun_area <- function(reg_sel,var_sel){
   save_name <- paste('taylor',reg_sel,var_sel,'area.png',sep='_')
   png(save_name)
-  taylor.diagram(uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", area]
+  my_taylor (uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", area]
                  , model=uncer[reg == reg_sel&var==var_sel&met=="1"&par=="2", area]
-                 , pos.cor = T, pch=1, col=blacols[2], normalize=T,main = paste0(reg_sel,": ",var_sel, " area"),cex.axis = 1.4)
+                 , pos.cor = T, pch=1, col=blacols[2], normalize=T,main = paste0(reg_sel," ",var_sel, " area"), cex.axis = 1.6, pcex=1.3, show.gamma = T, ref.sd=T, gamma.col='forestgreen')
   for(p in 1:10){
     print(p)
     for(m in 1:10){
       if(m==1&p==1|p==1&m==7){
         
       }else{
-        taylor.diagram(uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", area], 
-                       model=uncer[reg == reg_sel&var==var_sel&met==as.character(m)&par==as.character(p), area], pos.cor = T,add=T,pch=m,col=blacols[p], normalize=T,main = '',cex.axis = 1.4)
+        my_taylor (uncer[reg == reg_sel&var==var_sel&met=="1"&par=="1", area], 
+                       model=uncer[reg == reg_sel&var==var_sel&met==as.character(m)&par==as.character(p), area], pos.cor = T,add=T,pch=m,col=blacols[p], normalize=T,main = '', cex.axis = 1.6, pcex=1.3, show.gamma = T, ref.sd=T, gamma.col='forestgreen')
         
       }
     }
@@ -672,7 +673,7 @@ ggplot(aa,aes(x=fac,fill=comb))+
   theme_bw()+
   scale_fill_manual(values=my_cols(8))+
   labs(x=expression(paste(sigma[met],":",sigma[par])),fill="")+
-  theme(legend.position = 'top',axis.text = element_text(size = 14), axis.title = element_text(size=14),title = element_text(size=18),legend.text = element_text(size=18))
+  theme(legend.position = 'top',axis.text = element_text(size = 16), axis.title = element_text(size=16),title = element_text(size=18),legend.text = element_text(size=18))
   #labs(title = bquote(frac(sigma[met],sigma[par]) ~"="~ .(my_ratio)))
 ggsave(paste0('hist_comp_all.png'))
 
