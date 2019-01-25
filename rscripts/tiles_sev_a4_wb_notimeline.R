@@ -31,9 +31,9 @@ library(cowplot)
 uncer_raw <- data.table(readRDS("D:/RGROUP/DATA/extremity_ens_EUR_FIXED.rds"))
 
 ######### COLORS  BROWN ########
-heavy_rain <- "white"; strong_rain <- '#eca776'; mean_rain <- '#e07020'; light_rain <- '#8b4513'
-strong_drought_s <- '#8b4513'; mean_drought_s <- '#e07020'; light_drought_s <- '#eca776'
-strong_drought_q <- '#8b4513'; mean_drought_q <- '#e07020'; light_drought_q <- '#eca776'
+heavy_rain <- "white"; strong_rain <- '#f2c4a3'; mean_rain <- '#e68d4d'; light_rain <- '#b85b19'
+strong_drought_s <- '#b85b19'; mean_drought_s <- '#e68d4d'; light_drought_s <- '#f2c4a3'
+strong_drought_q <- '#b85b19'; mean_drought_q <- '#e68d4d'; light_drought_q <- '#f2c4a3'
 
 ######################### TILES AREA vs YEARS wo NOISE #########################
 
@@ -591,5 +591,12 @@ point_med_q_g <- ggplot_gtable(ggplot_build(point_med_q))
 mat <- matrix(list(ceu_s_g, ceu_q_g, med_s_g, med_q_g), nrow = 2)
 z <- matrix(c(1, 2, 3, 4), nrow = 2, byrow = T)
 grid.newpage()
-grid.draw(gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
-                                heights = unit(c(1, 1), "null"), z = z))
+#grid.draw(gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
+ #                               heights = unit(c(1, 1), "null"), z = z))
+
+graphs <- gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
+                                heights = unit(c(1, 1), "null"), z = z)
+
+fin <-  gtable::gtable_matrix(name = "demo", grobs = matrix(list(graphs, legend), nrow = 2), widths = unit(c(1), "null"), 
+                              heights = unit(c(0.977, 0.023), "null"), z = matrix(c(1,2), nrow = 2))
+grid.draw(fin)

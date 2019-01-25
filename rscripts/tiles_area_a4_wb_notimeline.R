@@ -8,30 +8,32 @@ library(ggpubr)
 library(cowplot)
 
 ############################## PREPARE DATA ####################################
-uncer_raw <- data.table(readRDS("D:/RGROUP/DATA/new_PAR_MET (1).rds"))
-uncer_raw$MET <- NULL
-uncer_raw$PAR <- NULL
-colnames(uncer_raw) <- c("MET", "PAR", "REG", "var", "yr", "SEVERITY", "AREA") 
-uncer_raw[, REG:=factor(REG, levels = c('CEU', 'MED', 'EUR'))]
-uncer_raw[, ID:= paste0(MET, "_", PAR)]
-uncer_raw[, RANK_SEV:= rank(SEVERITY, na.last = FALSE), by = .(REG, ID, var)]
-uncer_raw[, RANK_AREA:= rank(AREA, na.last = FALSE), by = .(REG, ID, var)]
-colnames(uncer_raw) <- c("MET", "PAR", "REG", "VAR", "YR", "SEVERITY", "AREA", "ID", "RANK_SEV", "RANK_AREA")
-###### ID 5_2 MET_PAR###### 
+# uncer_raw <- data.table(readRDS("D:/RGROUP/DATA/new_PAR_MET (1).rds"))
+# uncer_raw$MET <- NULL
+# uncer_raw$PAR <- NULL
+# colnames(uncer_raw) <- c("MET", "PAR", "REG", "var", "yr", "SEVERITY", "AREA") 
+# uncer_raw[, REG:=factor(REG, levels = c('CEU', 'MED', 'EUR'))]
+# uncer_raw[, ID:= paste0(MET, "_", PAR)]
+# uncer_raw[, RANK_SEV:= rank(SEVERITY, na.last = FALSE), by = .(REG, ID, var)]
+# uncer_raw[, RANK_AREA:= rank(AREA, na.last = FALSE), by = .(REG, ID, var)]
+# colnames(uncer_raw) <- c("MET", "PAR", "REG", "VAR", "YR", "SEVERITY", "AREA", "ID", "RANK_SEV", "RANK_AREA")
+# ###### ID 5_2 MET_PAR###### 
+# 
+# dat5_2 <- uncer_raw[ID %in% c("5_1", "5_3", "6_2", "4_2"), {SEVERITY = mean(SEVERITY); AREA = mean(AREA); RANK_SEV = mean(RANK_SEV);
+# RANK_AREA = mean(RANK_AREA); list(SEVERITY = SEVERITY, AREA = AREA, RANK_SEV = RANK_SEV, RANK_AREA = RANK_AREA)},
+# by = .(REG,VAR, YR)]
+# dat5_2[,MET:= 5]
+# dat5_2[,PAR:= 2]
+# dat5_2[, ID:= paste0(MET, "_", PAR)]
+# setcolorder(dat5_2, neworder = colnames(uncer_raw))
+# uncer_raw <- rbind(uncer_raw, dat5_2)
 
-dat5_2 <- uncer_raw[ID %in% c("5_1", "5_3", "6_2", "4_2"), {SEVERITY = mean(SEVERITY); AREA = mean(AREA); RANK_SEV = mean(RANK_SEV);
-RANK_AREA = mean(RANK_AREA); list(SEVERITY = SEVERITY, AREA = AREA, RANK_SEV = RANK_SEV, RANK_AREA = RANK_AREA)},
-by = .(REG,VAR, YR)]
-dat5_2[,MET:= 5]
-dat5_2[,PAR:= 2]
-dat5_2[, ID:= paste0(MET, "_", PAR)]
-setcolorder(dat5_2, neworder = colnames(uncer_raw))
-uncer_raw <- rbind(uncer_raw, dat5_2)
+uncer_raw <- data.table(readRDS("D:/RGROUP/DATA/extremity_ens_EUR_FIXED.rds"))
 
 ######### COLORS  BROWN ########
-heavy_rain <- "white"; strong_rain <- '#eca776'; mean_rain <- '#e07020'; light_rain <- '#8b4513'
-strong_drought_s <- '#8b4513'; mean_drought_s <- '#e07020'; light_drought_s <- '#eca776'
-strong_drought_q <- '#8b4513'; mean_drought_q <- '#e07020'; light_drought_q <- '#eca776'
+heavy_rain <- "white"; strong_rain <- '#f2c4a3'; mean_rain <- '#e68d4d'; light_rain <- '#b85b19'
+strong_drought_s <- '#b85b19'; mean_drought_s <- '#e68d4d'; light_drought_s <- '#f2c4a3'
+strong_drought_q <- '#b85b19'; mean_drought_q <- '#e68d4d'; light_drought_q <- '#f2c4a3'
 
 ############################### TILES vs YEARS #################################
 
@@ -603,5 +605,12 @@ point_med_q_g <- ggplot_gtable(ggplot_build(point_med_q))
 mat <- matrix(list(ceu_s_g, ceu_q_g, med_s_g, med_q_g), nrow = 2)
 z <- matrix(c(1, 2, 3, 4), nrow = 2, byrow = T)
 grid.newpage()
-grid.draw(gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
-                                heights = unit(c(1, 1), "null"), z = z))
+#grid.draw(gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
+ #                               heights = unit(c(1, 1), "null"), z = z))
+
+graphs <- gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
+                                heights = unit(c(1, 1), "null"), z = z)
+
+fin <-  gtable::gtable_matrix(name = "demo", grobs = matrix(list(graphs, legend), nrow = 2), widths = unit(c(1), "null"), 
+                              heights = unit(c(0.977, 0.023), "null"), z = matrix(c(1,2), nrow = 2))
+grid.draw(fin)
