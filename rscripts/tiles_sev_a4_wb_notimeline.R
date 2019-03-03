@@ -30,6 +30,8 @@ library(cowplot)
 
 uncer_raw <- data.table(readRDS("D:/RGROUP/DATA/extremity_ens_EUR_FIXED.rds"))
 
+size_axis_title <- 10; size_axis_text <- 9; size_title <- 12; size_strip <- 8; size_thick <- 2
+
 ######### COLORS  BROWN ########
 heavy_rain <- "white"; strong_rain <- '#f2c4a3'; mean_rain <- '#e68d4d'; light_rain <- '#b85b19'
 strong_drought_s <- '#b85b19'; mean_drought_s <- '#e68d4d'; light_drought_s <- '#f2c4a3'
@@ -75,15 +77,15 @@ ceu_s <- ggplot(uncer_raw[REG == "CEU" & VAR == "s" & RANK_SEV >= 125 & YR %in% 
   geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(125, 224, 247, 250))), colour = "white") +
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
-  facet_wrap(~YR, nrow = 6) +
+  facet_wrap(~YR, nrow = 4) +
   #scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
   scale_fill_manual(values = c(light_drought_s, mean_drought_s, strong_drought_s)) +
   ggtitle("CEU Soil moisture drought / Severity") +
-  theme(strip.text = element_text(size = 7, colour = 'black'),
+  theme(strip.text = element_text(size = size_strip, colour = 'black'),
         legend.position = "none", 
-        axis.title = element_text(size = 9),
-        axis.text = element_text(size = 8),
-        plot.title = element_text(size = 12)) +
+        axis.title = element_text(size = size_axis_title),
+        axis.text = element_text(size = size_axis_text),
+        plot.title = element_text(size = size_title)) +
   panel_border(colour = "black") +
   labs(x = "Model parameterization set number", y = "Meteorological forcing set number")
 
@@ -126,7 +128,7 @@ tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_ceu <- intersect(years_ceu_q, years_ceu_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "black"]
-tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 2]
+tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= size_thick]
 #tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
 tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 2]
 tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
@@ -147,10 +149,13 @@ for (i in stript) {
 
 stript <- which(grepl('panel', ceu_s_g$layout$name))
 #length(stript) <- prod(dim(matrix(stript, nrow = 3)))
-common_yr_matr <- matrix(stript, nrow = 6, byrow = F)
-common_yr_vec <- c(common_yr_matr[6,], common_yr_matr[5,], common_yr_matr[4,],
+common_yr_matr <- matrix(stript, nrow = 4, byrow = F)
+#common_yr_vec <- c(common_yr_matr[6,], common_yr_matr[5,], common_yr_matr[4,],
+ #                  common_yr_matr[3,], common_yr_matr[2,], common_yr_matr[1,])
+common_yr_vec <- c(common_yr_matr[4,],
                    common_yr_matr[3,], common_yr_matr[2,], common_yr_matr[1,])
-not <- tail(common_yr_matr[6,], num_nas)
+#not <- tail(common_yr_matr[6,], num_nas)
+not <- tail(common_yr_matr[4,], num_nas)
 
 k <- 1
 for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
@@ -202,15 +207,15 @@ med_s <- ggplot(uncer_raw[REG == "MED" & VAR == "s" & RANK_SEV >= 125 & YR %in% 
   geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(125, 224, 247, 250))), colour = "white") +
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
-  facet_wrap(~YR, nrow = 6) +
+  facet_wrap(~YR, nrow = 4) +
   #scale_fill_viridis("RANK", option = "D", direction = 1, discrete = T) +
   scale_fill_manual(values = c(light_drought_s, mean_drought_s, strong_drought_s)) +
   ggtitle("MED Soil moisture drought / Severity") +
-  theme(strip.text = element_text(size = 7, colour = 'black'),
+  theme(strip.text = element_text(size = size_strip, colour = 'black'),
         legend.position = "none", 
-        axis.title = element_text(size = 9),
-        axis.text = element_text(size = 8),
-        plot.title = element_text(size = 12)) +
+        axis.title = element_text(size = size_axis_title),
+        axis.text = element_text(size = size_axis_text),
+        plot.title = element_text(size = size_title)) +
   panel_border(colour = "black") +
   labs(x = "Model parameterization set number", y = "Meteorological forcing set number")
 
@@ -253,7 +258,7 @@ tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_med <- intersect(years_med_q, years_med_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_med2[YR %in% common_years_med, COM_COL:= "black"]
-tab_col_med2[YR %in% common_years_med, COM_THI:= 2]
+tab_col_med2[YR %in% common_years_med, COM_THI:= size_thick]
 #tab_col_med2[YR %in% common_all, COM_THI:= 4]
 tab_col_med2[YR %in% common_years_med, COM_LTY:= 2]
 tab_col_med2[YR %in% common_all, COM_LTY:= 1]
@@ -274,10 +279,13 @@ for (i in stript) {
 
 stript <- which(grepl('panel', med_s_g$layout$name))
 #length(stript) <- prod(dim(matrix(stript, nrow = 3)))
-common_yr_matr <- matrix(stript, nrow = 6, byrow = F)
+common_yr_matr <- matrix(stript, nrow = 4, byrow = F)
 common_yr_vec <- c(common_yr_matr[6,], common_yr_matr[5,], common_yr_matr[4,],
                    common_yr_matr[3,], common_yr_matr[2,], common_yr_matr[1,])
-not <- tail(common_yr_matr[6,], num_nas)
+common_yr_vec <- c(common_yr_matr[4,],
+                   common_yr_matr[3,], common_yr_matr[2,], common_yr_matr[1,])
+#not <- tail(common_yr_matr[6,], num_nas)
+not <- tail(common_yr_matr[4,], num_nas)
 
 k <- 1
 for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
@@ -329,15 +337,15 @@ ceu_q <- ggplot(uncer_raw[REG == "CEU" & VAR == "q" & RANK_SEV >= 125 & YR %in% 
   geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(125, 224, 247, 250))), colour = "white") +
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
-  facet_wrap(~YR, nrow = 6) +
+  facet_wrap(~YR, nrow = 4) +
   #scale_fill_viridis("RANK", option = "D",direction = 1, discrete = T) +
   scale_fill_manual(values = c(light_drought_q, mean_drought_q, strong_drought_q)) +
   ggtitle("CEU Runoff drought / Severity") +
-  theme(strip.text = element_text(size = 7, colour = 'black'),
+  theme(strip.text = element_text(size = size_strip, colour = 'black'),
         legend.position = "none", 
-        axis.title = element_text(size = 9),
-        axis.text = element_text(size = 8),
-        plot.title = element_text(size = 12)) +
+        axis.title = element_text(size = size_axis_title),
+        axis.text = element_text(size = size_axis_text),
+        plot.title = element_text(size = size_title)) +
   panel_border(colour = "black") +
   labs(x = "Model parameterization set number", y = "Meteorological forcing set number")
 
@@ -380,7 +388,7 @@ tab_col_ceu2 <- merge(x = tab_col_ceu, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_ceu <- intersect(years_ceu_q, years_ceu_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_ceu2[YR %in% common_years_ceu, COM_COL:= "black"]
-tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= 2]
+tab_col_ceu2[YR %in% common_years_ceu, COM_THI:= size_thick]
 #tab_col_ceu2[YR %in% common_all, COM_THI:= 4]
 tab_col_ceu2[YR %in% common_years_ceu, COM_LTY:= 2]
 tab_col_ceu2[YR %in% common_all, COM_LTY:= 1]
@@ -401,10 +409,13 @@ for (i in stript) {
 
 stript <- which(grepl('panel', ceu_q_g$layout$name))
 #length(stript) <- prod(dim(matrix(stript, nrow = 3)))
-common_yr_matr <- matrix(stript, nrow = 6, byrow = F)
-common_yr_vec <- c(common_yr_matr[6,], common_yr_matr[5,], common_yr_matr[4,],
+common_yr_matr <- matrix(stript, nrow = 4, byrow = F)
+#common_yr_vec <- c(common_yr_matr[6,], common_yr_matr[5,], common_yr_matr[4,],
+ #                  common_yr_matr[3,], common_yr_matr[2,], common_yr_matr[1,])
+common_yr_vec <- c(common_yr_matr[4,],
                    common_yr_matr[3,], common_yr_matr[2,], common_yr_matr[1,])
-not <- tail(common_yr_matr[6,], num_nas)
+#not <- tail(common_yr_matr[6,], num_nas)
+not <- tail(common_yr_matr[4,], num_nas)
 
 k <- 1
 for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
@@ -456,15 +467,15 @@ med_q <- ggplot(uncer_raw[REG == "MED" & VAR == "q" & RANK_SEV >= 125 & YR %in% 
   geom_tile(aes(x = PAR, y = MET, fill = cut(RANK_SEV, breaks = c(125, 224, 247, 250))), colour = "white") +
   scale_x_continuous(breaks = c(1,5,10)) +
   scale_y_continuous(breaks = c(1,5,10)) +
-  facet_wrap(~YR, nrow = 6) +
+  facet_wrap(~YR, nrow = 4) +
   #scale_fill_viridis("RANK",option = "D",direction = 1, discrete = T) +
   scale_fill_manual(values = c(light_drought_q, mean_drought_q, strong_drought_q)) +
   ggtitle("MED Runoff drought / Severity") +
-  theme(strip.text = element_text(size = 7, colour = 'black'),
+  theme(strip.text = element_text(size = size_strip, colour = 'black'),
         legend.position = "none", 
-        axis.title = element_text(size = 9),
-        axis.text = element_text(size = 8),
-        plot.title = element_text(size = 12)) +
+        axis.title = element_text(size = size_axis_title),
+        axis.text = element_text(size = size_axis_text),
+        plot.title = element_text(size = size_title)) +
   panel_border(colour = "black") +
   labs(x = "Model parameterization set number", y = "Meteorological forcing set number")
 
@@ -507,7 +518,7 @@ tab_col_med2 <- merge(x = tab_col_med, y = yr_vec, by.x = "YR", by.y = "YR")
 common_years_med <- intersect(years_med_q, years_med_s)
 common_all <- Reduce(intersect, list(years_ceu_q, years_ceu_s, years_med_q, years_med_s))
 tab_col_med2[YR %in% common_years_med, COM_COL:= "black"]
-tab_col_med2[YR %in% common_years_med, COM_THI:= 2]
+tab_col_med2[YR %in% common_years_med, COM_THI:= size_thick]
 #tab_col_med2[YR %in% common_all, COM_THI:= 4]
 tab_col_med2[YR %in% common_years_med, COM_LTY:= 2]
 tab_col_med2[YR %in% common_all, COM_LTY:= 1]
@@ -528,10 +539,13 @@ for (i in stript) {
 
 stript <- which(grepl('panel', med_q_g$layout$name))
 #length(stript) <- prod(dim(matrix(stript, nrow = 3)))
-common_yr_matr <- matrix(stript, nrow = 6, byrow = F)
-common_yr_vec <- c(common_yr_matr[6,], common_yr_matr[5,], common_yr_matr[4,],
+common_yr_matr <- matrix(stript, nrow = 4, byrow = F)
+#common_yr_vec <- c(common_yr_matr[6,], common_yr_matr[5,], common_yr_matr[4,],
+ #                  common_yr_matr[3,], common_yr_matr[2,], common_yr_matr[1,])
+common_yr_vec <- c(common_yr_matr[4,],
                    common_yr_matr[3,], common_yr_matr[2,], common_yr_matr[1,])
-not <- tail(common_yr_matr[6,], num_nas)
+#not <- tail(common_yr_matr[6,], num_nas)
+not <- tail(common_yr_matr[4,], num_nas)
 
 k <- 1
 for (i in common_yr_vec[which(!common_yr_vec %in% not)]) {
@@ -588,12 +602,35 @@ point_med_q_g <- ggplot_gtable(ggplot_build(point_med_q))
 #grid.draw(gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
 #                                heights = unit(c(0.6, 2, 0.6, 2), "null"), z = z))
 
-mat <- matrix(list(ceu_s_g, ceu_q_g, med_s_g, med_q_g), nrow = 2)
-z <- matrix(c(1, 2, 3, 4), nrow = 2, byrow = T)
+#mat <- matrix(list(ceu_s_g, ceu_q_g, med_s_g, med_q_g), nrow = 2)
+#z <- matrix(c(1, 2, 3, 4), nrow = 2, byrow = T)
+##### GRAPH 1 #####
+mat <- matrix(list(ceu_s_g, ceu_q_g), nrow = 2)
+z <- matrix(c(1, 2), nrow = 2, byrow = T)
+
+##### GRAPH 2 #####
+mat <- matrix(list(med_s_g, med_q_g), nrow = 2)
+z <- matrix(c(1, 2), nrow = 2, byrow = T)
+
 grid.newpage()
 #grid.draw(gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
  #                               heights = unit(c(1, 1), "null"), z = z))
 
+#graphs <- gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
+ #                               heights = unit(c(1, 1), "null"), z = z)
+
+#fin <-  gtable::gtable_matrix(name = "demo", grobs = matrix(list(graphs, legend), nrow = 2), widths = unit(c(1), "null"), 
+#                              heights = unit(c(0.977, 0.023), "null"), z = matrix(c(1,2), nrow = 2))
+#grid.draw(fin)
+
+##### GRAPH 1 ######
+graphs <- gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1), "null"), 
+                                heights = unit(c(1, 1), "null"), z = z)
+
+fin <-  gtable::gtable_matrix(name = "demo", grobs = matrix(list(graphs, legend), nrow = 2), widths = unit(c(1), "null"), 
+                              heights = unit(c(0.977, 0.023), "null"), z = matrix(c(1,2), nrow = 2))
+grid.draw(fin)
+##### GRAPH 2 ######
 graphs <- gtable::gtable_matrix(name = "demo", grobs = mat, widths = unit(c(1, 1), "null"), 
                                 heights = unit(c(1, 1), "null"), z = z)
 
